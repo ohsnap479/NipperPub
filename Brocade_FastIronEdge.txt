@@ -1,0 +1,70 @@
+ver 04.1.01eTc1
+!
+!
+!
+!
+vlan 1 name DEFAULT-VLAN by port
+ other-proto
+ management-vlan
+!
+!
+!
+!
+enable super-user-password .....
+enable port-config-password .....
+ip address 30.120.1.109 255.255.255.0
+username admin password .....
+username Charles nopassword
+web-management https
+web-management allow-no-password
+web-management enable ethe 1
+web-management enable vlan 1
+!
+access-list 40 permit host 192.168.2.1
+access-list 40 permit host 172.10.1.35
+access-list 40 permit host 10.0.0.1
+access-list 40 permit host 192.168.0.1
+access-list 40 deny any log
+!
+access-list 110 permit tcp any any
+!
+access-list 120 permit ip 50.60.0.0 0.0.255.255 any
+access-list 120 permit tcp any host 192.168.30.56 eq 9876
+access-list 120 permit tcp any any eq 9876
+access-list 120 deny tcp any host 192.168.30.56 eq 9876
+!
+ip access-list extended cp-critical-in
+ permit tcp host 212.241.243.217 host 212.241.243.218 eq bgp
+ permit tcp host 192.168.224.10 host 192.168.224.51 eq ssl
+ permit tcp host 192.168.224.10 host 192.168.224.52 eq ssl log
+ permit tcp host 192.168.224.51 eq ssl host 192.168.224.10
+ permit tcp host 192.168.224.52 eq ssl host 192.168.224.10
+ permit tcp host 192.168.224.11 host 192.168.224.52 eq ssl
+ permit tcp host 192.168.224.51 eq ssl host 192.168.224.11
+ permit tcp host 192.168.224.52 eq ssl host 192.168.224.11
+ permit icmp host 192.168.224.10 host 192.168.224.51 echo
+ permit icmp host 192.168.224.10 host 192.168.224.52 echo
+ permit icmp host 192.168.224.51 host 192.168.224.10 echo-reply
+ permit icmp host 192.168.224.52 host 192.168.224.10 echo-reply
+ permit icmp host 192.168.224.11 host 192.168.224.52 echo
+ permit icmp host 192.168.224.51 host 192.168.224.11 echo-reply
+ permit icmp host 192.168.224.52 host 192.168.224.11 echo-reply
+ deny ip any any
+!
+ip access-list extended named-acl-1
+ deny ip host 172.168.2.3 any
+ deny ip host 10.8.10.11 any
+ permit ip any any
+!
+ip access-list extended named-acl-2
+ permit ip host 192.168.76.4 any
+ permit ip host 172.18.19.1 any
+!
+!
+!
+!
+ip ssh  permit-empty-passwd yes
+ip ssh  key-authentication no
+!
+!
+end

@@ -1,0 +1,534 @@
+Current configuration with default configurations exposed : 11447 bytes
+!
+! Last configuration change at 12:42:43 UTC Wed Aug 24 2016 by admin
+!
+version 15.0
+parser cache
+parser config partition
+no service log backtrace
+no service config
+no service exec-callback
+no service nagle
+service slave-log
+no service slave-coredump
+no service pad to-xot
+no service pad from-xot
+no service pad cmns
+no service pad
+no service telnet-zeroidle
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec show-timezone
+service timestamps log datetime msec
+service password-encryption
+no service exec-wait
+no service linenumber
+no service internal
+no service scripting
+no service compress-config
+service prompt config
+no service old-slip-prompts
+no service pt-vty-logging
+no service disable-ip-fast-frag
+no service sequence-numbers
+no service dhcp
+!
+hostname CiscoIOS15
+!
+boot-start-marker
+boot-end-marker
+!
+no logging discriminator
+logging exception 4096
+no logging count
+no logging message-counter log
+no logging message-counter debug
+logging message-counter syslog
+no logging snmp-authfail
+no logging userinfo
+logging buginf
+logging queue-limit 100
+logging queue-limit esm 0
+logging queue-limit trap 100
+logging buffered 4096
+logging reload message-limit 1000 notifications
+no logging persistent
+logging rate-limit console 10 except errors
+logging console guaranteed
+logging console critical
+logging monitor debugging
+logging cns-events informational
+logging on
+enable secret 5 $1$8je9$O10MwM4HVnnM6rGeHFHel0
+enable password 7 095C4F1A0A1218000F
+!
+ipc holdq threshold upper 0
+ipc holdq threshold lower 0
+ipc header-cache permanent 1000 100
+ipc buffers min-free 1
+ipc buffers max-free 8
+ipc buffers permanent 2
+aaa new-model
+!
+!
+aaa authentication login default enable
+aaa authentication enable default enable
+aaa accounting exec default
+ action-type none
+!
+aaa accounting commands 15 default
+ action-type none
+!
+aaa accounting network default
+ action-type none
+!
+aaa accounting connection default
+ action-type none
+!
+aaa accounting system default
+ action-type none
+!
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+cef table consistency-check IPv4 auto-repair delay 10 holddown 300
+cef table consistency-check IPv6 auto-repair delay 10 holddown 300
+cef table rate-monitor-period 5
+errdisable detect cause all
+errdisable recovery interval 300
+dot11 syslog
+dot11 activity-timeout unknown default 60
+dot11 activity-timeout client default 60
+dot11 activity-timeout repeater default 60
+dot11 activity-timeout workgroup-bridge default 60
+dot11 activity-timeout bridge default 60
+dot11 aaa csid default
+prompt config hostname-length 20
+no ip source-route
+ip icmp redirect subnet
+ip spd queue threshold minimum 73 maximum 74
+!
+!
+!
+!
+ip cef
+ip cef load-sharing algorithm universal 34ED9DC6
+no ip bootp server
+no ip domain lookup
+ip domain name test.test
+ip ips memory threshold 26
+ip igmp snooping vlan 1
+ip igmp snooping vlan 1 mrouter learn pim-dvmrp
+ip igmp snooping
+no ipv6 cef
+ipv6 cef load-sharing algorithm universal 34ED9DC6
+ipv6 dhcp ping packets 0
+!
+multilink bundle-name authenticated
+!
+cwmp agent
+ no enable download
+ no enable
+ request outstanding 5
+ parameter change notify interval 60
+ session retry limit 11
+ management server username 00000C-CISCO1841V05-FCZ130693M0
+ no management server password
+ no management server url
+ no provision code
+ no connection request username
+ no connection request password
+ no wan ipaddress
+!
+!
+key chain keychain
+ key 1
+  key-string 7 020D0142
+!
+!
+!
+!
+no snap notification exclude service acl
+no snap notification exclude service eem
+no snap notification exclude service snapt
+license udi pid CISCO1841 sn FCZ130693M0
+archive
+ log config
+  no record rc
+  no logging enable
+  logging size 100
+  no notify syslog contenttype plaintext
+  no notify syslog contenttype xml
+  no hidekeys
+ path flash:rollbackconfig
+ maximum 2
+ no rollback filter adaptive
+ rollback retry timeout 0
+ no write-memory
+ time-period 0
+file prompt alert
+emm clear 1b5b324a1b5b303b30480d
+vtp file flash:vlan.dat
+vtp mode transparent
+vtp version 1
+modem call-record terse max-userid 30
+username admin secret 5 $1$spr6$R9GYbviV7MFKSwoAsb0MD0
+username Test secret 5 $1$cM/.$55zreXKAkf234gowEWj6j0
+!
+redundancy
+ no maintenance-mode
+scripting tcl low-memory 63198267
+scripting tcl trustpoint untrusted terminate
+no scripting tcl secure-mode
+!
+!
+ip tftp source-interface Loopback0
+ip ssh time-out 120
+ip ssh authentication-retries 3
+ip ssh break-string ~break
+ip ssh version 2
+ip ssh dh min size 1024
+!
+no crypto isakmp diagnose error
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no ip address
+ ip redirects
+ no ip proxy-arp
+ ip load-sharing per-destination
+ ip cef accounting non-recursive internal
+ snmp trap link-status
+ !
+!
+interface Loopback1
+ no ip address
+ ip redirects
+ no ip proxy-arp
+ ip verify unicast source reachable-via rx
+ ip load-sharing per-destination
+ ip cef accounting non-recursive internal
+ snmp trap link-status
+ !
+!
+interface FastEthernet0/0
+ ip address 192.168.0.17 255.255.255.0
+ ip redirects
+ no ip proxy-arp
+ ip authentication mode eigrp 1 md5
+ ip authentication key-chain eigrp 1 keychain
+ ip load-sharing per-destination
+ ip cef accounting non-recursive internal
+ ip rip authentication mode md5
+ ip rip authentication key-chain keychain
+ ip ospf message-digest-key 1 md5 7 04500E1F
+ speed auto
+ half-duplex
+ snmp trap link-status
+ no mop enabled
+ !
+!
+interface FastEthernet0/1
+ no ip address
+ ip redirects
+ no ip proxy-arp
+ ip load-sharing per-destination
+ ip cef accounting non-recursive internal
+ shutdown
+ duplex auto
+ speed auto
+ snmp trap link-status
+ !
+!
+interface ATM0/1/0
+ no ip address
+ ip redirects
+ no ip proxy-arp
+ ip load-sharing per-destination
+ ip cef accounting non-recursive internal
+ shutdown
+ atm restart timer 300
+ no atm ilmi-keepalive
+ dsl operating-mode auto
+ no dsl enable-training-log
+ dsl open-delay 5
+ clock rate aal5 8000000
+ clock rate aal2 8000000
+ snmp trap link-status
+ !
+!
+interface Async0/0/0
+ no ip address
+ ip redirects
+ no ip proxy-arp
+ ip load-sharing per-destination
+ ip cef accounting non-recursive internal
+ encapsulation slip
+ snmp trap link-status
+ !
+!
+ip access-list extended named-acl-1
+ deny ip host 172.168.2.3 any
+ deny ip host 10.8.10.11 any
+ permit ip any any
+ip access-list extended named-acl-2
+ permit ip host 192.168.76.4 any
+ permit ip host 172.18.19.1 any
+!
+ip access-list extended cp-critical-in
+ remark Control plane critical traffic - inbound
+ remark BGP
+ permit tcp host 212.241.243.217 host 212.241.243.218 eq bgp
+ permit tcp host 212.241.243.217 eq bgp host 212.241.243.218
+ permit tcp host 192.168.224.154 host 192.168.224.153 eq bgp
+ permit tcp host 192.168.224.154 eq bgp host 192.168.224.153
+ permit tcp host 192.168.224.150 host 192.168.224.149 eq bgp
+ permit tcp host 192.168.224.150 eq bgp host 192.168.224.149
+ permit tcp host 192.168.224.162 host 192.168.224.161 eq bgp
+ permit tcp host 192.168.224.162 eq bgp host 192.168.224.161
+ permit tcp host 192.168.123.123 host 192.192.192.192 eq ftp
+ remark DHCP
+ permit udp host 0.0.0.0 host 255.255.255.255 eq bootps
+ permit udp host 10.1.23.1 eq bootps any eq bootps
+ remark CSM Probes HTTP
+ permit tcp host 192.168.224.10 host 192.168.224.51 eq www
+ permit tcp host 192.168.224.10 host 192.168.224.52 eq www
+ permit tcp host 192.168.224.51 eq www host 192.168.224.10
+ permit tcp host 192.168.224.52 eq www host 192.168.224.10 established
+ permit tcp host 192.168.224.11 host 192.168.224.51 eq www
+ permit tcp host 192.168.224.11 host 192.168.224.52 eq www
+ permit tcp host 192.168.224.51 eq www host 192.168.224.11 fragments
+ permit tcp host 192.168.224.52 eq www host 192.168.224.11
+ remark CSM Probes HTTPS
+ permit tcp host 192.168.224.10 host 192.168.224.51 eq 443
+ permit tcp host 192.168.224.10 host 192.168.224.52 eq 443 log
+ permit tcp host 192.168.224.51 eq 443 host 192.168.224.10
+ permit tcp host 192.168.224.52 eq 443 host 192.168.224.10
+ permit tcp host 192.168.224.11 host 192.168.224.51 eq 443 log
+ permit tcp host 192.168.224.11 host 192.168.224.52 eq 443
+ permit tcp host 192.168.224.51 eq 443 host 192.168.224.11
+ permit tcp host 192.168.224.52 eq 443 host 192.168.224.11
+ remark CSM Probes ICMP
+ permit icmp host 192.168.224.10 host 192.168.224.51 echo
+ permit icmp host 192.168.224.10 host 192.168.224.52 echo
+ permit icmp host 192.168.224.51 host 192.168.224.10 echo-reply
+ permit icmp host 192.168.224.52 host 192.168.224.10 echo-reply
+ permit icmp host 192.168.224.11 host 192.168.224.51 echo
+ permit icmp host 192.168.224.11 host 192.168.224.52 echo
+ permit icmp host 192.168.224.51 host 192.168.224.11 echo-reply
+ permit icmp host 192.168.224.52 host 192.168.224.11 echo-reply
+ deny   ip any any
+access-list 110 permit tcp any any
+access-list 120 permit ip 50.60.0.0 0.0.255.255 any
+access-list 120 permit tcp any eq ftp any log-input
+access-list 120 permit tcp any host 192.168.30.40 eq snmp
+access-list 120 permit tcp host 192.168.20.10 host 192.168.30.40 eq snmp
+access-list 120 permit tcp host 192.168.20.12 host 192.168.30.40 eq snmp
+access-list 120 permit tcp any host 192.168.30.56 eq 9876
+access-list 120 permit tcp any any eq 9876
+access-list 120 deny tcp any host 192.168.30.56 eq 9876
+access-list 40 permit 192.168.2.1
+access-list 40 permit 172.10.1.35
+access-list 40 permit 10.0.0.1
+access-list 40 permit 192.168.0.1
+access-list 40 deny   any log
+!
+router eigrp name
+ !
+ address-family ipv4 unicast autonomous-system 1
+  !
+  af-interface default
+   authentication mode md5
+   authentication key-chain keychain
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+router ospf 1
+ log-adjacency-changes
+ area 0 authentication message-digest
+!
+router rip
+ network 3.0.0.0
+!
+router bgp 1
+ no synchronization
+ bgp log-neighbor-changes
+ neighbor 1.1.1.1 remote-as 3
+ neighbor 1.1.1.1 password 7 13151601181B0B382F
+ neighbor 1.2.3.4 remote-as 1
+ neighbor 1.2.3.4 password 7 03145A1815182E5E4A
+ no auto-summary
+!
+ip default-gateway 10.200.4.254
+ip forward-protocol nd
+no ip http server
+ip http port 80
+ip http authentication enable
+no ip http secure-server
+ip http secure-port 443
+ip http secure-active-session-modules all
+ip http max-connections 5
+ip http timeout-policy idle 180 life 180 requests 1
+ip http active-session-modules all
+ip http digest algorithm md5
+ip http client cache memory pool 100
+ip http client cache memory file 2
+ip http client cache ager interval 5
+ip http client connection timeout 10
+ip http client connection retry 1
+ip http client connection pipeline-length 5
+ip http client connection idle timeout 30
+ip http client response timeout 30
+ip http path
+!
+!
+ip rtcp report interval 5000
+ip rtcp sub-rtcp message-type 209
+ip tacacs source-interface Loopback0
+!
+no ip sla logging traps
+logging history size 1
+logging history warnings
+logging trap informational
+logging delimiter tcp
+no logging origin-id
+logging facility local7
+logging source-interface Loopback1
+logging 10.10.10.10
+access-list 1 permit any
+access-list 3 permit any
+access-list 18 permit any
+mac-address-table aging-time 300
+no cdp run
+
+!
+!
+!
+!
+snmp-server engineID local 8000000903000024977E9F46
+snmp-server group snmpCISGroup v3 priv match exact read v1default
+snmp-server view *ilmi system included
+snmp-server view *ilmi atmForumUni included
+snmp-server view v1default iso included
+snmp-server view v1default internet.6.3.15 excluded
+snmp-server view v1default internet.6.3.16 excluded
+snmp-server view v1default internet.6.3.18 excluded
+snmp-server view v1default ciscoMgmt.394 excluded
+snmp-server view v1default ciscoMgmt.395 excluded
+snmp-server view v1default ciscoMgmt.399 excluded
+snmp-server view v1default ciscoMgmt.400 excluded
+snmp-server view *tv.00000001.00000000.00000000.00000000.000000000F ieee802dot11 included
+snmp-server view *tv.00000001.00000000.00000000.00000000.000000000F internet included
+snmp-server community Testcom v1default RO 18
+snmp-server community cisCommunity v1default RO 3
+snmp-server community trapString v1default RO 3
+snmp-server priority normal
+no snmp-server trap link ietf
+snmp-server trap authentication vrf
+snmp-server trap authentication acl-failure
+snmp-server trap authentication unknown-content
+snmp-server packetsize 1500
+snmp-server queue-limit notification-host 10
+snmp-server chassis-id FCZ130693M0
+snmp-server enable traps snmp authentication linkdown linkup coldstart
+no snmp-server enable traps nhrp nhs up
+no snmp-server enable traps nhrp nhs down
+no snmp-server enable traps nhrp nhc up
+no snmp-server enable traps nhrp nhc down
+no snmp-server enable traps nhrp nhp up
+no snmp-server enable traps nhrp nhp down
+no snmp-server enable traps nhrp quota-exceeded
+snmp-server host 1.2.3.4 traps version 1 trapString udp-port 162  snmp
+snmp-server inform retries 3 timeout 15 pending 25
+snmp mib event sample minimum 60
+snmp mib event sample instance maximum 0
+snmp mib expression delta minimum 1
+snmp mib expression delta wildcard maximum 0
+ snmp mib nhrp
+snmp mib notification-log globalsize 500
+snmp mib notification-log globalageout 15
+snmp mib community-map  ILMI engineid 8000000903000024977E9F46
+snmp mib community-map  Testcom engineid 8000000903000024977E9F46
+snmp mib community-map  cisCommunity engineid 8000000903000024977E9F46
+snmp mib community-map  trapString engineid 8000000903000024977E9F46
+!
+tacacs-server host 18.1.1.1
+!
+control-plane
+ !
+!
+alias atm-vc-config vbr vbr-nrt
+alias exec h help
+alias exec lo logout
+alias exec p ping
+alias exec r resume
+alias exec s show
+alias exec u undebug
+alias exec un undebug
+alias exec w where
+banner exec ^C
+This is the exec banner ^C
+banner login ^C
+This is the login banner ^C
+banner motd ^C
+This is the motd banner ^C
+default-value exec-character-bits 7
+default-value special-character-bits 7
+default-value data-character-bits 8
+!
+line con 0
+ exec-timeout 9 0
+ login authentication cisTest
+line aux 0
+ exec-timeout 9 0
+ login authentication cisTest
+ no exec
+line 0/0/0
+ exec-timeout 9 0
+ login authentication cisTest
+ stopbits 1
+ speed 115200
+ flowcontrol hardware
+line vty 0 4
+ access-class 1 in
+ exec-timeout 9 0
+ password 7 021605481811003348
+ login authentication cisTest
+ transport input ssh
+line vty 5 807
+ access-class 1 in
+ exec-timeout 9 0
+ login authentication cisTest
+ transport input ssh
+!
+scheduler allocate 20000 1000
+ntp authentication-key 5 md5 140713181F13253920 7
+ntp authenticate
+ntp trusted-key 5
+ntp source Loopback0
+ntp server 11.11.11.11 key 5
+cns id hostname
+cns id hostname event
+cns id hostname image
+cns image retry 60
+netconf max-sessions 4
+netconf lock-time 10
+netconf max-message 0
+event manager scheduler script thread class default number 1
+event manager scheduler applet thread class default number 32
+event manager history size events 10
+event manager history size traps 10
+end

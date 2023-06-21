@@ -1,0 +1,90 @@
+; J9086A Configuration Editor; Created on release #R.11.107
+
+hostname "ProCurve Switch 2610-24/12PWR"
+snmp-server contact "Tom"
+snmp-server location "London"
+max-vlans 25
+time timezone -60
+time daylight-time-rule Continental-US-and-Canada
+ip access-list extended "named-acl-1"
+   deny ip 172.168.2.3 0.0.0.0 0.0.0.0 255.255.255.255
+   deny ip 10.8.10.11 0.0.0.0 0.0.0.0 255.255.255.255
+   permit ip 0.0.0.0 255.255.255.255 0.0.0.0 255.255.255.255
+   exit
+ip access-list extended "named-acl-2"
+   permit ip 192.168.76.4 0.0.0.0 0.0.0.0 255.255.255.255
+   permit ip 172.18.19.1 0.0.0.0 0.0.0.0 255.255.255.255
+   exit
+ip access-list extended "cp-critical-in"
+   permit tcp 212.241.243.217 0.0.0.0 212.241.243.218 0.0.0.0 eq 179
+   permit tcp 212.241.243.217 0.0.0.0 eq 179 212.241.243.218 0.0.0.0
+   permit tcp 192.168.224.154 0.0.0.0 192.168.224.153 0.0.0.0 eq 179
+   permit tcp 192.168.224.154 0.0.0.0 eq 179 192.168.224.153 0.0.0.0
+   permit tcp 192.168.224.150 0.0.0.0 192.168.224.149 0.0.0.0 eq 179
+   permit tcp 192.168.224.150 0.0.0.0 eq 179 192.168.224.149 0.0.0.0
+   permit tcp 192.168.224.162 0.0.0.0 192.168.224.161 0.0.0.0 eq 179
+   permit tcp 192.168.224.162 0.0.0.0 eq 179 192.168.224.161 0.0.0.0
+   permit tcp 192.168.123.123 0.0.0.0 192.192.192.192 0.0.0.0 eq 21
+   permit udp 0.0.0.0 0.0.0.0 255.255.255.255 0.0.0.0 eq 67
+   permit udp 10.1.23.1 0.0.0.0 eq 67 0.0.0.0 255.255.255.255 eq 67
+   permit tcp 192.168.224.10 0.0.0.0 192.168.224.51 0.0.0.0 eq 443
+   permit tcp 192.168.224.51 0.0.0.0 eq 443 192.168.224.10 0.0.0.0
+   permit tcp 192.168.224.52 0.0.0.0 eq 443 192.168.224.10 0.0.0.0
+   permit tcp 192.168.224.11 0.0.0.0 192.168.224.52 0.0.0.0 eq 443
+   permit tcp 192.168.224.51 0.0.0.0 eq 443 192.168.224.11 0.0.0.0
+   permit tcp 192.168.224.52 0.0.0.0 eq 443 192.168.224.11 0.0.0.0
+   deny ip 0.0.0.0 255.255.255.255 0.0.0.0 255.255.255.255
+   exit
+ip access-list extended "110"
+   permit tcp 0.0.0.0 255.255.255.255 0.0.0.0 255.255.255.255
+   exit
+ip access-list extended "120"
+   permit ip 50.60.0.0 0.0.255.255 0.0.0.0 255.255.255.255
+   permit tcp 0.0.0.0 255.255.255.255 192.168.30.56 0.0.0.0 eq 9876
+   permit tcp 0.0.0.0 255.255.255.255 0.0.0.0 255.255.255.255 eq 9876
+   exit
+ip access-list standard "40"
+   permit 192.168.0.1 0.0.0.255
+   deny 0.0.0.0 255.255.255.255 log
+   exit
+ip access-list standard "1"
+   permit 0.0.0.0 255.255.255.255
+   exit
+interface 11
+   no power
+exit
+interface 24
+   name "OfficeComms01"
+   flow-control
+   speed-duplex 100-full
+exit
+interface 28
+   disable
+exit
+ip default-gateway 192.168.2.254
+snmp-server community "public" Unrestricted
+vlan 1
+   name "DEFAULT_VLAN"
+   untagged 2-4,6-28
+   no ip address
+   no untagged 1,5
+   exit
+vlan 2
+   name "VLAN for Linux"
+   ip address 192.168.1.254 255.255.255.0
+   exit
+vlan 4
+   name "VLAN4"
+   untagged 5
+   ip address 192.168.1.201 255.255.255.0
+   exit
+vlan 8
+   name "VLAN8"
+   untagged 1
+   ip address 192.168.2.208 255.255.255.0
+   exit
+primary-vlan 8
+banner motd "Unauthorized access is strictly prohibited"
+aaa authentication num-attempts 10
+ip ssh
+password manager

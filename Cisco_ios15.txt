@@ -1,0 +1,233 @@
+Building configuration...
+
+Current configuration : 6025 bytes
+!
+! Last configuration change at 13:26:24 UTC Mon Sep 20 2021 by Josh
+!
+version 15.0
+no service pad
+no service config
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname Critical_Risk_IOS15
+!
+boot-start-marker
+boot-end-marker
+!
+security passwords min-length 8
+enable secret 8 $1$..wG$DKcdHPgPVcbHhwGCizrOj/
+!
+aaa new-model
+aaa local authentication attempts max-fail 30
+!
+!
+aaa authentication login default local
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+dot11 syslog
+no ip source-route
+ip admission name webauth1 proxy http inactivity-time 60
+!
+!
+ip dhcp bootp ignore
+!
+!
+ip cef
+no ip bootp server
+no ip domain lookup
+ip domain name uk.titania.com
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-834679690
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-834679690
+ revocation-check none
+ rsakeypair TP-self-signed-834679690
+!
+!
+crypto pki certificate chain TP-self-signed-834679690
+ certificate self-signed 01
+  30820251 308201BA A0030201 02020101 300D0609 2A864886 F70D0101 04050030
+  30312E30 2C060355 04031325 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 38333436 37393639 30301E17 0D313931 31323231 32303732
+  335A170D 32303031 30313030 30303030 5A303031 2E302C06 03550403 1325494F
+  532D5365 6C662D53 69676E65 642D4365 72746966 69636174 652D3833 34363739
+  36393030 819F300D 06092A86 4886F70D 01010105 0003818D 00308189 02818100
+  BA2F6FD8 BBE3F44F 9FE703BA C50D4285 50C52BCB D9E925B7 4888AF72 7870D546
+  AD2EDB1F 8CFCC3A6 E9CE3CA5 C80DBED4 9285B0DB E64D0800 4F7448D9 40043A40
+  4703DF0E 80165145 AE5F3B2A 74085454 DD2F62F6 FC62BD79 C457A54E 41FF8CCA
+  B17B173A 084DA143 0BDEA796 DDEDF1B9 76F083D9 E1DA630B 916DFA06 42DB8287
+  02030100 01A37B30 79300F06 03551D13 0101FF04 05300301 01FF3026 0603551D
+  11041F30 1D821B54 6974616E 6961494F 5331352E 756B2E74 6974616E 69612E63
+  6F6D301F 0603551D 23041830 168014F1 0DCAA9DE D80A4AFF 4DDCED56 2286983B
+  8703E630 1D060355 1D0E0416 0414F10D CAA9DED8 0A4AFF4D DCED5622 86983B87
+  03E6300D 06092A86 4886F70D 01010405 00038181 0043D8EB 063567D4 3D4ABB0B
+  7D2C673E 860C561C D186A8FA 3C204088 252DB5EB A53BD2EB EE8B0BED F17AA54F
+  70C1EB69 06AC5D53 4EE82C23 0DC0855D B251E334 24C61D8C 61179F70 D0054F22
+  884FD2F6 A9F74E7E 058FC650 3C3FA217 B80E5E11 46CAD254 D8D220E5 209AC603
+  39A0A41E FD0B6A55 A61014BC C9CCF716 F00DF191 06
+        quit
+!
+!
+license udi pid CISCO1841 sn FCZ130693M0
+vtp domain domain
+vtp mode transparent
+username Backup privilege 15 secret 8 $1$zU81$gBm6HD5.j0Mp6Bgmvl/rr1
+username Josh privilege 15 password 0 password
+!
+redundancy
+!
+!
+ip ssh version 2
+!
+class-map match-all test2
+ match vlan  40
+class-map match-all chicken
+ description Class map description text
+ match protocol ip
+!
+!
+policy-map test-policy
+ description This is a test policy
+ class test2
+    police 512000 8000 conform-action transmit  exceed-action transmit
+ class chicken
+    police 256000 4000 conform-action transmit  exceed-action drop
+!
+!
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ description "Inside Interface, used for device management via ssh"
+ ip address 10.100.9.246 255.255.255.0
+ ip access-group 102 in
+ ip access-group 102 out
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip rip send version 2
+ ip rip receive version 2
+ ip rip authentication mode md5
+ ip rip authentication key-chain Test_Chain
+ speed auto
+ full-duplex
+ no mop enabled
+ !
+!
+interface FastEthernet0/1
+ no ip address
+ ip access-group webauth1 out
+ shutdown
+ duplex auto
+ speed auto
+ !
+!
+interface ATM0/1/0
+ no ip address
+ shutdown
+ no atm ilmi-keepalive
+ !
+!
+interface Async0/0/0
+ no ip address
+ encapsulation slip
+ shutdown
+ !
+!
+no ip classless
+ip forward-protocol nd
+no ip http server
+ip http access-class 99
+ip http secure-server
+ip http secure-ciphersuite 3des-ede-cbc-sha
+ip http timeout-policy idle 120 life 600 requests 10
+!
+ip flow-export source FastEthernet0/1
+!
+ip default-network 10.100.9.254
+ip route 10.100.5.0 255.255.255.0 10.100.9.254
+ip route 10.100.9.0 255.255.255.0 10.100.9.254
+ip route 10.100.64.0 255.255.255.0 10.100.9.254
+!
+ip access-list extended test
+!
+logging 10.100.10.10
+access-list 99 permit 10.100.9.0 0.0.0.255 log
+access-list 99 permit 10.100.5.0 0.0.0.255 log
+access-list 99 permit 10.100.64.0 0.0.0.255 log
+access-list 99 deny   any log
+access-list 101 permit ip 10.100.9.0 0.0.0.255 any log
+access-list 101 permit ip 10.100.5.0 0.0.0.255 any log
+access-list 101 permit ip 10.100.64.0 0.0.0.255 any log
+access-list 101 deny   ip any any log
+access-list 102 permit tcp 10.100.64.1 0.0.0.0 eq 55 host 10.100.9.246 eq 55 log
+access-list 102 deny   ip any any log
+cdp timer 65
+cdp holdtime 150
+no cdp run
+
+!
+!
+!
+!
+snmp-server engineID remote 1.1.1.2 udp-port 120 1A232C01290A
+snmp-server group Test_Comm3 v3 auth read read
+!
+!
+control-plane
+ !
+!
+privilege configure level 15 terminal-queue
+privilege exec all level 5 configure terminal
+privilege exec level 5 configure
+privilege exec all level 3 show running-config
+privilege exec level 3 show
+banner exec ^C Now entering Exec mode. Ensure you have permission before editing this device. ^C
+banner login ^C You should only access this device if you have permission to do so. Any access without permission will be punished with legal action. ^C
+!
+line con 0
+line aux 0
+ no exec
+line 0/0/0
+ access-class 101 in
+ access-class 101 out
+ stopbits 1
+ speed 115200
+ flowcontrol hardware
+line vty 0 4
+ access-class 101 in
+ access-class 101 out
+ secret 8 03340F5E5318715E5C3B3D4446
+ transport input ssh
+!
+scheduler allocate 20000 1000
+ntp authentication-key 1 md5 03340F5E5318715E5C3B3D4446 7
+ntp authenticate
+ntp broadcastdelay 50
+ntp access-group peer 99
+ntp access-group query-only 99
+ntp server 80.86.38.193 key 1 prefer
+event manager applet test
+ event syslog pattern "%SYS-5-CONFIG_I"
+ action 1 comment This is a comment
+ action 2 cli command "show version"
+!
+end

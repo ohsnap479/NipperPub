@@ -1,0 +1,241 @@
+#
+!Software Version V100R006C05
+ sysname Quidway
+#
+ FTP server enable
+#
+ dns resolve
+#
+ vlan batch 2
+#
+ stp bpdu-filter default
+ stp mode stp
+ stp timer hello 400
+ stp timer forward-delay 1600
+ stp timer max-age 1800
+ stp max-hops 35
+ stp timer-factor 5
+ stp instance 1 root primary
+ stp bpdu-protection
+ stp converge fast
+#
+lldp enable
+#
+ http server load flash:/s3700-28tp-ei-v100r006c05.web.zip
+ http timeout 60
+#
+ssl policy test
+#
+radius-server template radiustemplate
+ radius-server retransmit 5
+#
+acl number 2003
+ rule 5 permit
+#
+acl number 3000
+ description inside
+ rule 5 permit ospf source 10.64.224.139 0 destination 224.0.0.5 0
+ rule 6 permit ospf source 10.64.224.139 0 destination 224.0.0.6 0
+ rule 10 permit 112 source 10.64.224.139 0 destination 224.0.0.18 0
+ rule 11 permit tcp source 10.64.224.0 0.0.7.255 destination 10.64.225.60 0 destination-port eq 22
+ rule 12 permit tcp source 10.64.224.0 0.0.7.255 destination 10.64.225.60 0 destination-port eq 5900
+ rule 20 permit ip source 10.64.224.0 0.0.7.255 destination 10.64.0.0 0.1.255.255
+ rule 30 permit ip source 10.64.224.0 0.0.7.255 destination 192.168.0.0 0.0.255.255
+ rule 50 permit ip source 10.64.224.0 0.0.7.255 destination 10.8.31.0 0.0.0.127
+ rule 200 deny ip
+acl number 3001
+ description outside
+ rule 5 permit ospf source 10.64.224.147 0 destination 224.0.0.5 0
+ rule 6 permit ospf source 10.64.224.147 0 destination 224.0.0.6 0
+ rule 10 permit ip source 10.8.31.0 0.0.0.127 destination 10.64.224.0 0.0.7.255
+ rule 20 permit ip source 10.64.0.0 0.1.255.255 destination 10.64.224.0 0.0.7.255
+ rule 30 permit ip source 192.168.0.0 0.0.255.255 destination 10.64.224.0 0.0.7.255
+ rule 200 deny ip logging
+acl number 3002
+ description alternate
+ rule 900 permit ip
+#
+aaa
+ authentication-scheme default
+ authorization-scheme default
+ accounting-scheme default
+ domain default
+ domain default_admin
+ local-user admin password cipher %@%@.pkDX-TP+6%!e!'Yv[A0SN1X%@%@ access-limit 529
+ local-user admin privilege level 15
+ local-user admin service-type telnet ssh
+ local-user charles password cipher %@%@&~8,F.lGq@~WjV:@*vR@,.2n%@%@
+#
+ospfv3 23
+#
+interface Vlanif1
+ ip address 192.168.8.216 255.255.255.0
+#
+interface Vlanif2
+#
+interface Ethernet0/0/1
+ shutdown
+ stp disable
+ stp bpdu-filter enable
+ bpdu disable
+ dot1x enable
+#
+interface Ethernet0/0/2
+ stp bpdu-filter enable
+#
+interface Ethernet0/0/3
+ stp bpdu-filter disable
+ bpdu disable
+#
+interface Ethernet0/0/4
+ stp root-protection
+#
+interface Ethernet0/0/5
+ stp loop-protection
+#
+interface Ethernet0/0/6
+#
+interface Ethernet0/0/7
+#
+interface Ethernet0/0/8
+ stp root-protection
+ stp bpdu-filter disable
+#
+interface Ethernet0/0/9
+#
+interface Ethernet0/0/10
+#
+interface Ethernet0/0/11
+#
+interface Ethernet0/0/12
+#
+interface Ethernet0/0/13
+#
+interface Ethernet0/0/14
+ stp bpdu-filter enable
+#
+interface Ethernet0/0/15
+#
+interface Ethernet0/0/16
+#
+interface Ethernet0/0/17
+#
+interface Ethernet0/0/18
+#
+interface Ethernet0/0/19
+#
+interface Ethernet0/0/20
+#
+interface Ethernet0/0/21
+#
+interface Ethernet0/0/22
+#
+interface Ethernet0/0/23
+#
+interface Ethernet0/0/24
+ stp loop-protection
+#
+interface GigabitEthernet0/0/1
+#
+interface GigabitEthernet0/0/2
+#
+interface GigabitEthernet0/0/3
+#
+interface GigabitEthernet0/0/4
+#
+interface NULL0
+#
+interface LoopBack0
+ ip address 10.64.224.162 255.255.255.255
+#
+bgp 24
+ #
+ ipv4-family unicast
+  undo synchronization
+  network 0.0.0.0
+#
+ospf 1
+ import-route direct
+ import-route static
+ area 0.0.0.0
+  network 10.64.224.144 0.0.0.7
+#
+ospf 4 router-id 10.25.36.37
+ filter-policy 2003 import
+ filter-policy 2003 export ospf 1
+ import-route ospf 1 cost 1 type 2 tag 557799
+ preference 14
+ preference ase 15
+ area 0.0.0.58
+  authentication-mode md5 128 cipher %@%@!E429.<)xIR]Lu373xY@0;+6%@%@
+  network 15.16.14.0 0.0.0.255
+  network 15.16.18.0 0.0.0.255
+  nssa
+ area 0.1.224.243
+  network 10.32.3.0 0.0.0.255
+ area 1.5.10.20
+  authentication-mode simple plain Password
+  network 18.19.1.0 0.0.0.255
+  stub
+ area 13.41.52.6
+  abr-summary 13.41.53.0 255.255.255.0 not-advertise  cost 160021
+  authentication-mode hmac-md5 1 plain Password1!
+  network 10.57.51.0 0.0.0.255
+ area 66.58.53.199
+  network 32.0.0.0 0.255.255.255
+#
+rip 1
+ undo summary
+ undo checkzero
+ undo host-route
+ version 1
+ preference 101
+ undo verify-source
+ timers rip 31 181 0 121
+#
+ripng 64
+#
+ ip route-static 0.0.0.0 0.0.0.0 192.168.4.254
+ ip route-static 0.0.0.0 0.0.0.0 192.168.8.254
+ ip route-static 192.168.8.0 255.255.255.0 Ethernet0/0/2 192.168.8.254
+ ip route-static 192.168.8.0 255.255.255.0 192.168.8.254
+ ip route-static 192.168.8.0 255.255.255.0 Vlanif1 192.168.8.254
+#
+ snmp-agent
+ snmp-agent local-engineid 000007DB7F00000100003D50
+ snmp-agent community write cipher %@%@_V$MA~>PeTa^2a'd^SPC0>{*W,UMB}34AX{R28AwB|V@>{-0y>aM""XyTEn#o.G425G5{60>%@%@
+ snmp-agent community write cipher %@%@_LF;Um#R))UJ6~-Em8x20>(boQOI,~"D3KG%U9U,Wc$">(e0s0k!Vk2o>';.;vEh{HdF(n0>%@%@
+ snmp-agent community read cipher %@%@ozkF+deU)&ZB+$U_T'$W0>#S%'h4Cyb!FMVmD}WQmM61>#V0R"f#VN*r-A@_Iz$-VM61#_0>%@%@
+ snmp-agent community write cipher %@%@Noqb9Qqj2(I}r_W8yDDT0>*ZqnW1!QWkl4AdPAHG<oQ3>*]0]/=(VX{"f5goKe1o{bn'*f0>%@%@
+ snmp-agent community write cipher %@%@`WnQT|K/;>8!NX0[+'6+0>&cm%rOOHj5Q$PYX\6+L^nI>&f0.m2'$/*,tKp^}[$^9lfY&o0>%@%@
+ snmp-agent community read cipher %@%@R:6"#hKP{4IBo3M@/ACV0>!eqVYXM<5v"(o$"uKT%,=T>!h0&$[uNJ/ht~}>rLB;xT;@!q0>%@%@
+ snmp-agent sys-info contact Titania Group
+ snmp-agent sys-info location Office12
+ snmp-agent sys-info version v1
+ undo snmp-agent sys-info version v3
+ snmp-agent group v3 v3group privacy  read-view v3view write-view v3view notify-view v3view
+ snmp-agent target-host trap address udp-domain 1.2.3.4 udp-port 1500 params securityname cipher %@%@Q>rK%/`lsN3v"m3YY2L(0>Q4R\=uPdY&O,NAc9':l8h%>Q70%@%@ v2c
+ snmp-agent target-host trap address udp-domain 101.102.103.104 params securityname Security v3 privacy
+ snmp-agent target-host trap address udp-domain 12.23.34.45 params securityname cipher %@%@%'w:X8dIiFQ;,%J_d^JQ0>Gq{lWk8*bH7U,H.S1j=2z/>Gt0%@%@
+ snmp-agent mib-view included v3view iso
+ snmp-agent mib-view excluded newview snmpUsmMIB
+ snmp-agent trap source LoopBack0
+#
+ ssh server authentication-retries 5
+ stelnet server enable
+ ssh user Admin
+ ssh user Admin authentication-type password
+ ssh user Admin service-type stelnet
+ ssh user charles
+#
+ tftp-server acl 2003
+#
+user-interface con 0
+ authentication-mode password
+ user privilege level 15
+ set authentication password cipher %@%@Uc6,P=K^TN@6HBGP\2aD,"3c]U'`-&2{_C,lRp4^6r6H"3f,%@%@
+user-interface vty 0 4
+ authentication-mode aaa
+ protocol inbound ssh
+#
+return

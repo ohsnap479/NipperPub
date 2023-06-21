@@ -1,0 +1,152 @@
+ver 07.3.06T12
+global-protocol-vlan
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+
+
+!
+
+
+
+!
+vlan 1 name DEFAULT-VLAN by port
+  router-interface ve 1
+!
+boot sys fl pri
+enable telnet password 8 $1$2Q0..ZN3$8gdUbYomsN3qHcnriGBGD0
+enable password-display
+enable super-user-password 8 $1$2Y1..ge3$pAiGDo1vA3WZOYXSQ99ml0
+hostname OfficeFoundryServerIron
+ip address 192.168.4.200 255.255.255.0
+ip dns domain-name Office1
+username admin password 8 $1$GE0..Jf/$bPEYmKUQ2nGwBgs3F9dsN1
+snmp-server community 0 public ro
+snmp-server community 1 $kQU85Q+8U rw
+snmp-server community 2 private ro
+web-management allow-no-password
+web-management enable ethe 1
+interface e 1
+ speed-duplex 100-full
+ ip access-group 1 in
+!
+interface e 2
+ speed-duplex 100-full
+!
+interface e 3
+ speed-duplex 100-full
+!
+interface e 4
+ speed-duplex 100-full
+!
+interface e 5
+ speed-duplex 100-full
+!
+interface e 6
+ speed-duplex 100-full
+!
+interface e 7
+ speed-duplex 100-full
+!
+interface e 8
+ speed-duplex 100-full
+!
+interface e 9
+ speed-duplex 100-full
+!
+interface e 10
+ speed-duplex 100-full
+!
+interface e 11
+ speed-duplex 100-full
+!
+interface e 12
+ speed-duplex 100-full
+!
+interface e 13
+ speed-duplex 100-full
+!
+interface e 14
+ speed-duplex 100-full
+!
+interface e 15
+ speed-duplex 100-full
+!
+interface e 16
+ speed-duplex 100-full
+!
+interface ve 1
+ ip address 192.168.2.201 255.255.255.0
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+access-list 40 permit any
+access-list 40 permit host 192.168.2.1
+access-list 40 permit host 172.10.1.35
+access-list 40 permit host 10.0.0.1
+access-list 40 permit host 192.168.0.1
+access-list 40 deny any log
+!
+access-list 110 permit tcp any any
+!
+access-list 120 permit ip 50.60.0.0 0.0.255.255 any
+access-list 120 permit tcp any host 192.168.30.56 eq 9876
+access-list 120 permit tcp any any eq 9876
+access-list 120 deny tcp any host 192.168.30.56 eq 9876
+!
+ip access-list extended cp-critical-in
+ permit tcp host 212.241.243.217 host 212.241.243.218 eq bgp
+ permit tcp host 192.168.224.10 host 192.168.224.51 eq ssl
+ permit tcp host 192.168.224.10 host 192.168.224.52 eq ssl log
+ permit tcp host 192.168.224.51 eq ssl host 192.168.224.10
+ permit tcp host 192.168.224.52 eq ssl host 192.168.224.10
+ permit tcp host 192.168.224.11 host 192.168.224.52 eq ssl
+ permit tcp host 192.168.224.51 eq ssl host 192.168.224.11
+ permit tcp host 192.168.224.52 eq ssl host 192.168.224.11
+ deny ip any any
+!
+ip access-list extended named-acl-1
+ deny ip host 172.168.2.3 any
+ deny ip host 10.8.10.11 any
+ permit ip any any
+!
+ip access-list extended named-acl-2
+ permit ip host 192.168.76.4 any
+ permit ip host 172.18.19.1 any
+!
+!
+end

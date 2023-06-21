@@ -1,0 +1,680 @@
+Building configuration...
+
+Current configuration : 14299 bytes
+!
+version 12.2
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+no service dhcp
+!
+hostname Critical_Risk_Catalyst
+!
+boot-start-marker
+boot-end-marker
+!
+logging buffered 64000
+logging console critical
+enable secret 9 $1$z2Cl$vzGZkYQ.c6VfHctfIMbTm.
+!
+username Test privilege 15 secret 8 $1$ZP5J$KiZTJIAjixKXTxlfKtsnO.
+!
+!
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authentication enable default enable
+aaa accounting exec default none
+aaa accounting commands 15 default none
+aaa accounting network default none
+aaa accounting connection default none
+aaa accounting system default none
+!
+!
+!
+aaa session-id common
+switch 1 provision ws-c3750-48p
+system mtu routing 1500
+vtp mode transparent
+no ip source-route
+ip routing
+no ip domain-lookup
+ip domain-name Titania
+ip dhcp bootp ignore
+!
+!
+!
+!
+key chain 1
+ key 1
+  key-string 7 0234575F2A572A33580F5B4A
+!
+crypto pki trustpoint TP-self-signed-1197163392
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1197163392
+ revocation-check none
+ rsakeypair TP-self-signed-1197163392
+!
+!
+crypto pki certificate chain TP-self-signed-1197163392
+ certificate self-signed 01
+  30820246 308201AF A0030201 02020101 300D0609 2A864886 F70D0101 04050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 31313937 31363333 3932301E 170D3933 30333031 30303031
+  35315A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 31393731
+  36333339 3230819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100B205 B85E8BD0 B4E91422 B91783A7 E0FF63E1 E1C41BD3 415CADB5 9B8063C6
+  DA9FCB9A 85ABB0D4 CCE45BEC CF377002 EAFDCB30 C6746439 F783CD14 5E52ED85
+  C94F4836 3A93102C 82244736 8606E5DF 5DE90BBC 153D6299 76A6DD0C 57F2439F
+  E0CF578A 0F339ADD A86D9485 30B35D37 652B9313 F9EE8FED C12C7DA4 1E33CEC8
+  ED0F0203 010001A3 6E306C30 0F060355 1D130101 FF040530 030101FF 30190603
+  551D1104 12301082 0E54535F 3132302E 54697461 6E696130 1F060355 1D230418
+  30168014 03AD0C46 2C30696B 37D161A5 E08C4E91 7C91F82B 301D0603 551D0E04
+  16041403 AD0C462C 30696B37 D161A5E0 8C4E917C 91F82B30 0D06092A 864886F7
+  0D010104 05000381 8100A92D 37F349CE A1DA0951 19E751AB A2161AB0 82483863
+  86D9CFAC CC0FA660 17EE5CA8 E680B0CF 17EE7B15 DD72D665 081E2D10 330A9140
+  066ACCFA 53B48E1B 8D90FAF5 70584EB6 AF653F83 12D4BFC0 086BD5B3 F27D646B
+  6E8D3DDB 8DEA5FC8 5087FB49 3309767B 578D838D FD52B77B BFA98337 18E07680
+  C36138FC 4BCEB921 E93B
+  quit
+!
+!
+!
+!
+spanning-tree mode mst
+spanning-tree loopguard default
+spanning-tree portfast bpduguard default
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+vlan 8
+!
+vlan 20
+ name test
+!
+ip tftp source-interface Loopback1
+ip ssh time-out 60
+ip ssh source-interface Vlan8
+ip ssh version 2
+!
+!
+!
+interface Loopback1
+ no ip address
+!
+interface FastEthernet1/0/1
+ switchport access vlan 8
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky
+ ip access-group 109 in
+ ip access-group 109 out
+ no mop enable
+!
+interface FastEthernet1/0/2
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ shutdown
+!
+interface FastEthernet1/0/3
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/4
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/5
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/6
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/7
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/8
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/9
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/10
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/11
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/12
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/13
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/14
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/15
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/16
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/17
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/18
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/19
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/20
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/21
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/22
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/23
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/24
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/25
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/26
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/27
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/28
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/29
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/30
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/31
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/32
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/33
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/34
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/35
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/36
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/37
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/38
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/39
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/40
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/41
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/42
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/43
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/44
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/45
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/46
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface FastEthernet1/0/47
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+!
+interface FastEthernet1/0/48
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+!
+interface GigabitEthernet1/0/1
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface GigabitEthernet1/0/2
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface GigabitEthernet1/0/3
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface GigabitEthernet1/0/4
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ switchport port-security mac-address sticky
+ no mop enable
+ ip access-group Test in
+ shutdown
+!
+interface Vlan1
+ no ip address
+ ip access-group Test in
+!
+interface Vlan8
+ ip address 10.100.9.196 255.255.255.0
+ ip access-group 109 in
+ ip access-group 109 out
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip rip authentication mode md5
+ ip rip authentication key-chain key-chain
+ ip ospf message-digest-key 1 md5 7 15020A1F173D24362C
+ ip ospf priority 255
+!
+interface Vlan20
+ ip address 192.168.34.1 255.255.255.0
+ ip access-group Test in
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Dot11Radio0/1
+ ip address 10.100.9.100 255.255.255.0
+ ip access-group 109 in
+ ip access-group 109 out
+ no shutdown
+ ssid Access_Point_9
+ wpa-psk ascii bf*hrKKHir9
+ !
+!
+router eigrp 1
+!
+router ospf 1
+ log-adjacency-changes
+ max-lsa 50
+ area 1 authentication message-digest
+!
+ip default-gateway 10.100.9.254
+ip classless
+ip route 10.100.5.0 255.255.255.0 10.100.9.254
+ip route 10.100.9.0 255.255.255.0 10.100.9.254
+ip route 10.100.64.0 255.255.255.0 10.100.9.254
+no ip http server
+no ip http secure-server
+!
+security passwords min-length 8
+!
+ip access-list extended Test
+!
+ip radius source-interface Loopback1
+ip sla enable reaction-alerts
+logging source-interface Loopback1
+logging 10.100.9.152
+access-list 1 permit any
+access-list 1 permit 0.0.0.0 255.255.255.0
+access-list 100 permit ip 0.0.0.0 255.255.255.0 0.0.0.189 255.255.255.0
+access-list 101 permit ip 10.100.5.0 0.0.0.255 any log
+access-list 101 permit ip 10.100.9.0 0.0.0.255 any log
+access-list 101 permit ip 10.100.64.0 0.0.0.255 any log
+access-list 101 deny   ip any any log
+access-list 109 permit tcp 10.100.5.8 0.0.0.0 eq 1 10.100.9.196 0.0.0.0 eq 1 log
+access-list 109 deny   ip any any log
+no cdp run
+!
+!
+banner exec ^C EXEC BANNER ^C
+banner login ^C c WARNING c 2 c UNAUTHORIZED ACCESS c 3 c ONLY USE/EDIT DEVICE IF YOU KNOW WHAT YOU ARE DOING c
+banner login ^C
+banner motd ^C MOTD BANNER ^C
+banner prompt-timeout ^C You are about to be logged out ^C
+banner config-save ^C Saving the ^C
+!
+line con 0
+ transport preferred telnet
+line vty 0 4
+ access-class 1 in
+ access-class Test out
+ privilege level 15
+ transport preferred none
+ transport input ssh
+line vty 5 14
+ access-class 1 in
+ access-class Test out
+ privilege level 15
+ transport preferred none
+ transport input ssh
+line vty 15
+ access-class 1 in
+ access-class Test out
+ privilege level 15
+ secret 8 053B525A745B1E1B0B3733535A
+ transport preferred none
+ transport input ssh
+!
+ntp authentication-key 2 md5 0234575F2A572A33580F5B4A 7
+ntp authenticate
+ntp clock-period 36028830
+ntp source Loopback1
+ntp access-group query-only 10
+ntp access-group peer 10
+ntp server 10.100.100.41 key 1
+end

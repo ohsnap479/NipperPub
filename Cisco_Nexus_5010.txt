@@ -1,0 +1,152 @@
+version 4.1(3)N2(1)
+feature fcoe
+feature port-track
+feature telnet
+feature tacacs+
+feature interface-vlan
+feature lacp
+role name default-role
+  description This is a system defined role and applies to all users.
+  rule 5 permit show feature environment
+  rule 4 permit show feature hardware
+  rule 3 permit show feature module
+  rule 2 permit show feature snmp
+  rule 1 permit show feature system
+username admin password 5 $1$A0qKA4AM$Engn1G2TAe6LkQ8OpJUWS/  role network-admin
+username Charles password 5 $1$88i.5.t1$oxPp.yx4zm7RQHr8TQ/D30  role network-ope
+rator
+username Zoe password 5 $1$0EBPuHpF$bbex27R2prC7APhYDhEAU.  role network-operato
+r
+no password strength-check
+
+banner motd #This is the message of the day#
+
+ssh key dsa
+ip host TitaniaNexus5010 192.168.8.195
+ip host Nexus5010 192.168.20.40
+aaa group server tacacs+ tacacs
+radius-server key 7 "swwxoomi"
+hostname TitaniaNexus5010
+ip access-list named-acl-2
+  10 permit ip 192.168.76.4/32 any
+  20 permit ip 172.18.19.1/32 any
+ip access-list cp-critical-in
+  10 remark Control plane critical traffic - inbound
+  20 remark BGP
+  30 permit tcp 212.241.243.217/32 212.241.243.218/32 eq bgp
+  40 permit tcp 212.241.243.217/32 eq bgp 212.241.243.218/32
+  50 permit tcp 192.168.224.154/32 192.168.224.153/32 eq bgp
+  60 permit tcp 192.168.224.154/32 eq bgp 192.168.224.153/32
+  70 permit tcp 192.168.224.150/32 192.168.224.149/32 eq bgp
+  80 permit tcp 192.168.224.150/32 eq bgp 192.168.224.149/32
+  90 permit tcp 192.168.224.162/32 192.168.224.161/32 eq bgp
+  100 permit tcp 192.168.224.162/32 eq bgp 192.168.224.161/32
+  110 permit tcp 192.168.123.123/32 192.192.192.192/32 eq ftp
+  120 remark DHCP
+  130 permit udp 0.0.0.0/32 255.255.255.255/32 eq bootps
+  140 permit udp 10.1.23.1/32 eq bootps any eq bootps
+  150 remark CSM Probes HTTP
+  160 permit tcp 192.168.224.10/32 192.168.224.51/32 eq www
+  170 permit tcp 192.168.224.10/32 192.168.224.52/32 eq www
+  180 permit tcp 192.168.224.51/32 eq www 192.168.224.10/32
+  190 permit tcp 192.168.224.52/32 eq www 192.168.224.10/32 established
+  200 permit tcp 192.168.224.11/32 192.168.224.51/32 eq www
+  210 permit tcp 192.168.224.11/32 192.168.224.52/32 eq www
+  220 permit tcp 192.168.224.52/32 eq www 192.168.224.11/32
+  230 remark CSM Probes HTTPS
+  240 permit tcp 192.168.224.10/32 192.168.224.51/32 eq 443
+  250 permit tcp 192.168.224.51/32 eq 443 192.168.224.10/32
+  260 permit tcp 192.168.224.52/32 eq 443 192.168.224.10/32
+  270 permit tcp 192.168.224.11/32 192.168.224.52/32 eq 443
+  280 permit tcp 192.168.224.51/32 eq 443 192.168.224.11/32
+  290 permit tcp 192.168.224.52/32 eq 443 192.168.224.11/32
+  300 remark CSM Probes ICMP
+  310 permit icmp 192.168.224.10/32 192.168.224.51/32 echo
+  320 permit icmp 192.168.224.10/32 192.168.224.52/32 echo
+  330 permit icmp 192.168.224.51/32 192.168.224.10/32 echo-reply
+  340 permit icmp 192.168.224.52/32 192.168.224.10/32 echo-reply
+  350 permit icmp 192.168.224.11/32 192.168.224.51/32 echo
+  360 permit icmp 192.168.224.11/32 192.168.224.52/32 echo
+  370 permit icmp 192.168.224.51/32 192.168.224.11/32 echo-reply
+  380 permit icmp 192.168.224.52/32 192.168.224.11/32 echo-reply
+  390 deny ip any any
+ip access-list named-acl-1
+  10 deny ip 172.168.2.3/32 any
+  20 deny ip 10.8.10.11/32 any
+  30 permit ip any any
+snmp-server contact line
+snmp-server user Zoe network-operator auth md5 0x6686494ca442aa601617e217664c756
+c priv 0x6686494ca442aa601617e217664c756c localizedkey
+snmp-server user admin network-admin auth md5 0x6686494ca442aa601617e217664c756c
+ priv 0x6686494ca442aa601617e217664c756c localizedkey
+snmp-server user Charles network-operator auth md5 0x6686494ca442aa601617e217664
+c756c priv 0x6686494ca442aa601617e217664c756c localizedkey
+snmp-server host 4.5.0.1 traps version 3 noauth Nathan
+snmp-server host 10.10.10.10 traps version 3 noauth James
+snmp-server enable traps entity fru
+snmp-server community private group network-operator
+snmp-server community public group network-admin
+ntp server 1.2.3.4
+vrf context management
+  ip route 0.0.0.0/0 192.168.8.254
+vlan 1,3
+
+interface Vlan1
+
+interface port-channel5
+  ip port access-group 2001 in
+
+interface port-channel23
+
+interface Ethernet1/1
+
+interface Ethernet1/2
+
+interface Ethernet1/3
+
+interface Ethernet1/4
+  ip port access-group named-acl-2 in
+  logging event port link-status
+
+interface Ethernet1/5
+  shutdown
+
+interface Ethernet1/6
+
+interface Ethernet1/7
+
+interface Ethernet1/8
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+
+interface Ethernet1/16
+
+interface Ethernet1/17
+
+interface Ethernet1/18
+
+interface Ethernet1/19
+
+interface Ethernet1/20
+
+interface mgmt0
+  ip address 192.168.8.195/24
+line vty
+  exec-timeout 0
+line console
+boot kickstart bootflash:/n5000-uk9-kickstart.4.1.3.N2.1.bin
+boot system bootflash:/n5000-uk9.4.1.3.N2.1.bin
+ip route 3.3.3.0/24 1.1.1.1
+ip arp timeout 28800

@@ -1,0 +1,465 @@
+ASA Version 9.1(1)
+!
+hostname Office-Cisco-ASA
+enable password NuLKvvWGg.x9HEKO encrypted
+xlate per-session deny tcp any4 any4
+xlate per-session deny tcp any4 any6
+xlate per-session deny tcp any6 any4
+xlate per-session deny tcp any6 any6
+xlate per-session deny udp any4 any4 eq domain
+xlate per-session deny udp any4 any6 eq domain
+xlate per-session deny udp any6 any4 eq domain
+xlate per-session deny udp any6 any6 eq domain
+passwd 2KFQnbNIdI.2KYOU encrypted
+names
+name 10.0.0.0 officeFTPserver
+ddns update method word
+!
+ip local pool 10.11.12.13 10.11.12.13
+ip local pool client-pool 192.168.1.1-192.168.1.254
+!
+interface Ethernet0/0
+ switchport access vlan 2
+!
+interface Ethernet0/1
+!
+interface Ethernet0/2
+!
+interface Ethernet0/3
+!
+interface Ethernet0/4
+!
+interface Ethernet0/5
+!
+interface Ethernet0/6
+ description Sixth interface on device
+!
+interface Ethernet0/7
+!
+interface Vlan1
+ nameif OfficeVLAN1
+ security-level 1
+ ip address 192.168.1.101 255.255.255.0
+!
+interface Vlan2
+ nameif OfficeOUTSIDE
+ security-level 0
+ ip address 10.20.0.1 255.0.0.0
+ ipv6 address 12:34:45:66::21/64
+ ipv6 enable
+!
+!
+time-range noTime
+!
+banner login Authorized use only!
+boot system disk0:/asa911-k8.bin
+ftp mode passive
+dns domain-lookup OfficeVLAN1
+dns domain-lookup OfficeOUTSIDE
+dns server-group home
+object network officeFTPserver
+ subnet 10.0.0.0 255.0.0.0
+ description Created during name migration
+object network nat2
+ range 10.1.1.1 10.1.1.80
+object network nat3
+ range 10.1.2.1 10.1.2.80
+object network host1
+ subnet 10.1.1.0 255.255.255.0
+object service host2
+ service tcp destination eq ftp
+object service host3
+ service tcp destination eq https
+object network NETWORK_OBJ_10.11.12.13
+ host 10.11.12.13
+object-group network Global_SMTP
+ description ALL NODES THAT NEED SMTP OPEN TO THE PUBLIC
+ network-object host 192.168.12.170
+object-group network Global_ISAKMP
+ description ALL NODES THAT NEED ISAKMP OPEN TO THE PUBLIC
+ network-object host 192.168.12.153
+object-group network obj_any
+object-group protocol proto_grp_1
+ protocol-object udp
+ protocol-object tcp
+ protocol-object esp
+object-group protocol titan_prt_1
+ protocol-object udp
+ protocol-object pim
+ protocol-object snp
+ group-object proto_grp_1
+object-group service titan_ports_1
+ description the ports that are allowable!!
+ service-object snp
+ service-object udp
+object-group network ftp_servers
+ network-object host 10.1.1.14
+ network-object host officeFTPserver
+ network-object 10.1.1.32 255.255.255.224
+object-group service a_Office_port tcp
+ port-object eq ftp
+ port-object range 2020 2021
+object-group protocol protoGROUP
+ description A group of protocols that will be used for testing.
+ protocol-object tcp
+object-group network pad_network_.-
+ description A network joinable from cisco ASA
+ network-object 100.100.100.100 255.255.255.254
+object-group network Office_admins
+ description Attempting to make valid IPS!
+ network-object host 10.1.1.4
+ network-object host 10.1.1.78
+ network-object host 10.1.1.34
+object-group network Office_nonADMINS
+ description Nonadmins nonadmins
+ network-object host 10.1.1.8
+ network-object host 10.1.1.9
+ network-object host 10.1.1.10
+object-group network net_join
+ description net_join has TWO object groups inside!
+object-group service my-DNS
+ description Domain Name Server
+ service-object tcp
+ service-object udp destination eq nameserver
+object-group service dns_internal_servers
+ description ...
+ service-object tcp destination eq www
+object-group service mService
+ service-object tcp destination eq www
+object-group network mNetwork
+ network-object host 10.100.1.1
+object-group service officeService1
+ description Primary Office Service
+ service-object tcp destination eq domain
+object-group service officeService2
+ service-object tcp destination eq domain
+ service-object udp destination eq domain
+object-group service Office-DNS
+ description Domain Name Server For Office
+ service-object tcp destination eq domain
+ service-object udp destination eq domain
+object-group network natonlygroup
+ network-object 192.168.18.0 255.255.255.0
+ network-object 12.50.1.0 255.255.255.0
+object-group network mappednat12
+ network-object object nat2
+object-group network mappednat23
+ network-object object nat2
+ network-object object nat3
+ network-object host 10.1.2.40
+access-list 2 standard deny host 192.168.14.42
+access-list extended extended permit tcp host 192.168.14.42 host 192.1.1.1 eq www
+access-list extended extended permit tcp host 192.168.14.42 host 192.1.1.1 eq ftp
+access-list LOGtest extended permit ip interface OfficeOUTSIDE interface OfficeVLAN1 log warnings
+access-list GR extended permit ip object officeFTPserver 192.168.0.0 255.255.0.0
+access-list 101 extended permit ip any4 object-group ftp_servers
+access-list 101 extended permit tcp host 74.165.236.76 host 68.156.91.20 eq 23032
+access-list 103 extended permit tcp any4 object-group a_Office_port any4 eq www
+access-list officeACL1 extended permit object-group protoGROUP object-group Office_admins object-group pad_network_.-
+access-list officeACL2 extended deny gre host 10.100.1.1 host 10.100.1.2
+access-list 3 extended deny gre interface OfficeVLAN1 host 177.50.1.1
+access-list listy standard permit host 192.168.14.50
+access-list my_accesslist extended permit object-group my-DNS object-group mNetwork any4
+access-list officeACL3 extended permit object-group officeService1 object-group mNetwork any4
+access-list Office-access extended permit object-group Office-DNS object-group mNetwork any4
+access-list OfficeOUTSIDE_cryptomap_1 extended permit ip object-group natonlygroup host 10.1.1.4
+access-list OfficeOUTSIDE_cryptomap extended permit ip 10.0.0.0 255.0.0.0 host 10.1.1.78
+access-list OfficeOUTSIDE_cryptomap_2 extended permit ip any4 any4
+pager lines 24
+logging enable
+logging monitor informational
+logging asdm informational
+logging host OfficeOUTSIDE 10.100.1.1
+mtu OfficeVLAN1 1500
+mtu OfficeOUTSIDE 1500
+ip verify reverse-path interface OfficeVLAN1
+ip verify reverse-path interface OfficeOUTSIDE
+icmp unreachable rate-limit 1 burst-size 1
+asdm image disk0:/asdm-711.bin
+no asdm history enable
+arp timeout 14400
+no arp permit-nonconnected
+nat (any,any) source dynamic nat2 mappednat23 service s1 s2
+nat (OfficeVLAN1,OfficeOUTSIDE) source static any any destination static NETWORK_OBJ_10.11.12.13 NETWORK_OBJ_10.11.12.13 no-proxy-arp route-lookup
+!
+object network host2
+ nat (OfficeOUTSIDE,OfficeVLAN1) dynamic mappednat23
+access-group officeACL1 in interface OfficeVLAN1
+!
+router rip
+ version 1
+!
+router ospf 6
+ network 192.168.0.0 255.255.255.0 area 30.10.20.40
+ network 192.168.1.0 255.255.255.0 area 0.0.0.0
+ log-adj-changes
+!
+route OfficeVLAN1 0.0.0.0 0.0.0.0 192.168.80.254 1
+route OfficeVLAN1 192.168.14.0 255.255.255.0 192.168.80.254 1
+route OfficeVLAN1 192.168.80.0 255.255.255.0 192.168.80.254 1
+route OfficeOUTSIDE 0.0.0.0 0.0.0.0 0.0.0.0 tunneled
+timeout xlate 3:00:00
+timeout pat-xlate 0:00:30
+timeout conn 1:00:00 half-closed 0:10:00 udp 0:00:00 icmp 0:00:02
+timeout sunrpc 0:10:00 h323 0:05:00 h225 1:00:00 mgcp 0:05:00 mgcp-pat 0:05:00
+timeout sip 0:30:00 sip_media 0:02:00 sip-invite 0:03:00 sip-disconnect 0:02:00
+timeout sip-provisional-media 0:02:00 uauth 0:05:00 absolute
+timeout tcp-proxy-reassembly 0:01:00
+timeout floating-conn 0:00:00
+dynamic-access-policy-record DfltAccessPolicy
+aaa-server MyRadius protocol radius
+aaa-server servergroup protocol radius
+user-identity default-domain LOCAL
+aaa authentication ssh console LOCAL
+aaa authentication telnet console LOCAL
+http server enable
+http server idle-timeout 300
+http server session-timeout 300
+http 192.168.1.0 255.255.255.0 OfficeVLAN1
+http officeFTPserver 255.0.0.0 OfficeVLAN1
+http authentication-certificate OfficeVLAN1
+snmp-server group another v3 priv
+snmp-server group OfficeGroup v3 auth
+snmp-server user Tom another v3 encrypted auth sha 90:7f:af:da:10:e0:dc:e8:47:7c:37:70:b3:26:99:2d:56:0e:b9:72 priv aes 256 90:7f:af:da:10:e0:dc:e8:47:7c:37:70:b3:26:99:2d:56:0e:b9:72:58:a1:ac:e1:5b:54:68:e6:d3:32:73:fe
+snmp-server user Charles another v3 encrypted auth md5 88:7f:ef:ca:f5:f9:3b:f8:df:74:81:e8:ec:c0:29:30 priv aes 256 88:7f:ef:ca:f5:f9:3b:f8:df:74:81:e8:ec:c0:29:30:85:0f:4c:22:33:96:37:cc:db:c4:c7:78:ee:c0:61:e4
+snmp-server host OfficeOUTSIDE 1.1.1.1 trap community *****
+snmp-server host OfficeOUTSIDE 192.168.20.30 community *****
+snmp-server host OfficeVLAN1 10.10.20.20 version 3 Tom
+snmp-server host OfficeOUTSIDE 10.20.45.39 community ***** version 2c
+snmp-server location London
+no snmp-server contact
+snmp-server community *****
+crypto ipsec ikev1 transform-set myset esp-aes esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-AES-128-SHA esp-aes esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-AES-128-MD5 esp-aes esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-AES-192-SHA esp-aes-192 esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-AES-192-MD5 esp-aes-192 esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-AES-256-SHA esp-aes-256 esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-AES-256-MD5 esp-aes-256 esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-AES-128-SHA-TRANS esp-aes esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-AES-128-SHA-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-AES-128-MD5-TRANS esp-aes esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-AES-128-MD5-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-AES-192-SHA-TRANS esp-aes-192 esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-AES-192-SHA-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-AES-192-MD5-TRANS esp-aes-192 esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-AES-192-MD5-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-AES-256-SHA-TRANS esp-aes-256 esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-AES-256-SHA-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-AES-256-MD5-TRANS esp-aes-256 esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-AES-256-MD5-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-3DES-SHA esp-3des esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-3DES-MD5 esp-3des esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-3DES-SHA-TRANS esp-3des esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-3DES-SHA-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-3DES-MD5-TRANS esp-3des esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-3DES-MD5-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-DES-SHA esp-des esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-DES-MD5 esp-des esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-DES-SHA-TRANS esp-des esp-sha-hmac
+crypto ipsec ikev1 transform-set ESP-DES-SHA-TRANS mode transport
+crypto ipsec ikev1 transform-set ESP-DES-MD5-TRANS esp-des esp-md5-hmac
+crypto ipsec ikev1 transform-set ESP-DES-MD5-TRANS mode transport
+crypto ipsec ikev2 ipsec-proposal AES256
+ protocol esp encryption aes-256
+ protocol esp integrity sha-1 md5
+crypto ipsec ikev2 ipsec-proposal AES192
+ protocol esp encryption aes-192
+ protocol esp integrity sha-1 md5
+crypto ipsec ikev2 ipsec-proposal AES
+ protocol esp encryption aes
+ protocol esp integrity sha-1 md5
+crypto ipsec ikev2 ipsec-proposal 3DES
+ protocol esp encryption 3des
+ protocol esp integrity sha-1 md5
+crypto ipsec ikev2 ipsec-proposal DES
+ protocol esp encryption des
+ protocol esp integrity sha-1 md5
+crypto ipsec security-association pmtu-aging infinite
+crypto dynamic-map nynmap 1 set ikev1 transform-set myset
+crypto dynamic-map nynmap 1 set reverse-route
+crypto dynamic-map SYSTEM_DEFAULT_CRYPTO_MAP 65535 set pfs group1
+crypto dynamic-map SYSTEM_DEFAULT_CRYPTO_MAP 65535 set ikev1 transform-set ESP-AES-128-SHA ESP-AES-128-MD5 ESP-AES-192-SHA ESP-AES-192-MD5 ESP-AES-256-SHA ESP-AES-256-MD5 ESP-3DES-SHA ESP-3DES-MD5 ESP-DES-SHA ESP-DES-MD5
+crypto map nynmap 1 match address OfficeOUTSIDE_cryptomap
+crypto map nynmap 1 set peer 8.8.8.8
+crypto map nynmap 1 set ikev1 phase1-mode aggressive
+crypto map nynmap 1 set ikev1 transform-set ESP-AES-128-SHA ESP-AES-128-MD5 ESP-AES-192-SHA ESP-AES-192-MD5 ESP-AES-256-SHA ESP-AES-256-MD5 ESP-3DES-SHA ESP-3DES-MD5 ESP-DES-SHA ESP-DES-MD5
+crypto map nynmap 1 set ikev2 ipsec-proposal AES256 AES192 AES 3DES DES
+crypto map nynmap 2 match address OfficeOUTSIDE_cryptomap_1
+crypto map nynmap 2 set peer 9.9.9.9
+crypto map nynmap 2 set ikev1 transform-set ESP-AES-128-SHA ESP-AES-128-MD5 ESP-AES-192-SHA ESP-AES-192-MD5 ESP-AES-256-SHA ESP-AES-256-MD5 ESP-3DES-SHA ESP-3DES-MD5 ESP-DES-SHA ESP-DES-MD5
+crypto map nynmap 2 set ikev2 ipsec-proposal AES256 AES192 AES 3DES DES
+crypto map nynmap 3 match address OfficeOUTSIDE_cryptomap_2
+crypto map nynmap 3 set peer officeFTPserver
+crypto map nynmap 3 set ikev1 phase1-mode aggressive
+crypto map nynmap 3 set ikev1 transform-set ESP-AES-128-SHA ESP-AES-128-MD5 ESP-AES-192-SHA ESP-AES-192-MD5 ESP-AES-256-SHA ESP-AES-256-MD5 ESP-3DES-SHA ESP-3DES-MD5 ESP-DES-SHA ESP-DES-MD5
+crypto map nynmap 3 set ikev2 ipsec-proposal AES256 AES192 AES 3DES DES
+crypto map nynmap 65535 ipsec-isakmp dynamic SYSTEM_DEFAULT_CRYPTO_MAP
+crypto map nynmap interface OfficeOUTSIDE
+crypto ca trustpool policy
+crypto ikev2 policy 1
+ encryption aes-256
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 policy 10
+ encryption aes-192
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 policy 20
+ encryption aes
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 policy 30
+ encryption 3des
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 policy 40
+ encryption des
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev1 enable OfficeOUTSIDE
+crypto ikev1 policy 65535
+ authentication pre-share
+ encryption aes
+ hash sha
+ group 2
+ lifetime 86400
+telnet 10.10.10.10 255.255.255.255 OfficeVLAN1
+telnet 192.168.14.0 192.168.14.254 OfficeVLAN1
+telnet 192.168.14.0 255.255.255.0 OfficeVLAN1
+telnet 10.11.13.0 255.255.255.0 OfficeVLAN1
+telnet 192.168.14.0 255.255.255.0 OfficeOUTSIDE
+telnet timeout 10
+ssh 192.168.14.0 255.255.255.0 OfficeVLAN1
+ssh 192.168.80.0 255.255.255.0 OfficeVLAN1
+ssh 192.168.1.0 255.255.255.0 OfficeOUTSIDE
+ssh 192.168.1.0 255.255.255.0 OfficeOUTSIDE
+ssh timeout 50
+console timeout 0
+vpdn username vpdnName password ***** store-local
+vpn-sessiondb max-anyconnect-premium-or-essentials-limit 1
+vpnclient server 1.1.1.1 2.2.2.2
+vpnclient mode client-mode
+vpnclient vpngroup group password *****
+vpnclient username officeuser password *****
+vpnclient management clear
+dhcpd auto_config OfficeOUTSIDE
+!
+threat-detection basic-threat
+threat-detection statistics access-list
+no threat-detection statistics tcp-intercept
+ntp server 192.168.2.2
+ntp server 192.168.80.254
+webvpn
+ enable OfficeOUTSIDE
+group-policy DfltGrpPolicy attributes
+ wins-server value 1.1.1.1
+ dns-server value 1.1.1.1
+ vpn-tunnel-protocol ikev1 ikev2 l2tp-ipsec ssl-client ssl-clientless
+ default-domain value uk
+group-policy GroupPolicy3 internal
+group-policy GroupPolicy3 attributes
+ vpn-tunnel-protocol ikev1 ikev2
+group-policy GroupPolicy2 internal
+group-policy GroupPolicy2 attributes
+ vpn-tunnel-protocol ikev1 ikev2
+group-policy GroupPolicy1 internal
+group-policy GroupPolicy1 attributes
+ vpn-tunnel-protocol ikev1 ikev2
+group-policy group internal
+group-policy group attributes
+ vpn-tunnel-protocol l2tp-ipsec
+username admin password 7KKG/zg/Wo8c.YfN encrypted
+username admin attributes
+ service-type remote-access
+username Tom password YqNVIeqOWJ065JKU encrypted privilege 15
+tunnel-group tunnel type remote-access
+tunnel-group group type remote-access
+tunnel-group group general-attributes
+ default-group-policy group
+tunnel-group client type remote-access
+tunnel-group client general-attributes
+ address-pool client-pool
+ authentication-server-group MyRadius
+tunnel-group 8.8.8.8 type ipsec-l2l
+tunnel-group 8.8.8.8 general-attributes
+ default-group-policy GroupPolicy1
+tunnel-group 8.8.8.8 ipsec-attributes
+ ikev1 pre-shared-key *****
+ ikev2 remote-authentication pre-shared-key *****
+ ikev2 local-authentication pre-shared-key *****
+tunnel-group 9.9.9.9 type ipsec-l2l
+tunnel-group 9.9.9.9 general-attributes
+ default-group-policy GroupPolicy2
+tunnel-group 9.9.9.9 ipsec-attributes
+ ikev1 pre-shared-key *****
+ ikev2 remote-authentication pre-shared-key *****
+ ikev2 local-authentication pre-shared-key *****
+tunnel-group 10.0.0.0 type ipsec-l2l
+tunnel-group 10.0.0.0 general-attributes
+ default-group-policy GroupPolicy3
+tunnel-group 10.0.0.0 ipsec-attributes
+ ikev1 pre-shared-key *****
+ ikev2 remote-authentication pre-shared-key *****
+ ikev2 local-authentication pre-shared-key *****
+tunnel-group stand type remote-access
+tunnel-group stand general-attributes
+ address-pool 10.11.12.13
+tunnel-group stand ipsec-attributes
+ ikev1 pre-shared-key *****
+!
+class-map CONNS
+ match any
+class-map inspection_default
+ match default-inspection-traffic
+!
+!
+policy-map type inspect dns preset_dns_map
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+policy-map global_policy
+ class inspection_default
+  inspect dns preset_dns_map
+  inspect ftp
+  inspect h323 h225
+  inspect h323 ras
+  inspect rsh
+  inspect rtsp
+  inspect esmtp
+  inspect sqlnet
+  inspect skinny
+  inspect sunrpc
+  inspect xdmcp
+  inspect sip
+  inspect netbios
+  inspect tftp
+  inspect ip-options
+policy-map CONNS
+ class CONNS
+  set connection timeout embryonic 0:00:05
+!
+service-policy global_policy global
+prompt hostname context
+no call-home reporting anonymous
+call-home
+ profile CiscoTAC-1
+  no active
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  destination address email callhome@cisco.com
+  destination transport-method http
+  subscribe-to-alert-group diagnostic
+  subscribe-to-alert-group environment
+  subscribe-to-alert-group inventory periodic monthly
+  subscribe-to-alert-group configuration periodic monthly
+  subscribe-to-alert-group telemetry periodic daily

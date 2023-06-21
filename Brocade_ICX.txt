@@ -1,0 +1,153 @@
+ver 07.4.00T311
+!
+stack unit 1
+  module 1 icx6450-24p-poe-port-management-module
+  module 2 icx6450-sfp-plus-4port-40g-module
+!
+!
+!
+!
+vlan 1 name DEFAULT-VLAN by port
+ spanning-tree 802-1w
+ ip-proto
+ management-vlan
+ default-gateway  192.168.8.254 1
+!
+!
+!
+!
+dot1x-enable
+!
+!
+!
+!
+!
+aaa authentication snmp-server default local
+aaa authentication web-server default local
+aaa authentication login default local radius line
+dhcp-gateway-list 1 5.5.5.5
+enable telnet authentication
+enable telnet password .....
+hostname TDemo_Brocade_ICX
+ip address 192.168.8.204 255.255.255.0
+logging host ipv6 4da6:49a6:4da6:49a2:4da6:4da6:4da6:4da6 udp-port 1302744486
+logging host ipv6 4da6:49a2:4da6:4da6:4da6:4da0:da6:4da6 udp-port 1302744494
+logging host ipv6 4da6:49a6:4da6:4da6:6da4:49a6:4da6:4d26 udp-port 229002662
+logging host ipv6 da6:4da6:4da6:4da6:49b6:4da2:da6:4d86 udp-port 1302482342
+logging host ipv6 eda6:4da6:4da6:4da6:49a6:4d26:4da6:4da6 udp-port 1302744486
+logging host ipv6 69a6:49a6:4da6:4da6:4da6:4da6:4da6:4da7 udp-port 1302744482
+logging facility sys9
+no logging buffered alerts
+logging persistence
+username admin password .....
+username Zoe nopassword
+radius-server host 1.1.1.1
+radius-server key 1 $4%VMMe-K1
+radius-server timeout 60
+tacacs-server host ipv6 1:2::23:45
+tacacs-server host 4.4.4.4
+snmp-server community ..... ro 1
+snmp-server community ..... rw
+no snmp-server enable traps new-root
+no snmp-server enable traps vsrp
+snmp-server host 1.1.1.1 version v1 .....
+snmp-server user Bob Group1 v3 encrypted auth md5 9b2c79a654653e2468210d06fb1da106
+snmp-server user Charles Group1 v3 encrypted auth md5 9b2c79a654653e2468210d06fb1da106
+
+web-management https
+web-management allow-no-password
+banner motd ^C
+-------THIS IS A BANNER-------! ^C
+!
+interface ethernet 1/1/7
+ ip access-group 5 in
+!
+interface ethernet 1/1/15
+ ip access-group 3 in
+!
+arp 1.1.1.1 000c.2962.7924 inspect
+!
+!
+access-list 1 permit 0.0.0.0
+access-list 1 permit any
+!
+access-list 2 permit host 5.5.5.5
+access-list 2 permit 0.0.0.0
+!
+access-list 3 permit 0.0.0.50 255.255.255.0
+access-list 3 permit host 5.5.5.5
+!
+access-list 4 permit 0.0.0.50 255.255.255.0
+!
+access-list 40 permit host 192.168.2.1
+access-list 40 permit host 172.10.1.35
+access-list 40 permit host 10.0.0.1
+access-list 40 permit host 192.168.0.1
+access-list 40 deny any log
+!
+access-list 100 permit udp host 0.0.0.0 eq 0 host 0.0.0.0 eq 0
+!
+access-list 101 permit ip 0.0.0.1 255.255.255.0 0.0.0.2 255.255.255.0
+!
+access-list 102 deny ip 0.0.0.1 255.255.255.0 0.0.0.2 255.255.255.0
+!
+access-list 103 permit ip host 0.0.0.0 host 0.0.0.0
+!
+access-list 110 permit tcp any any
+!
+access-list 120 permit ip 50.60.0.0 0.0.255.255 any
+access-list 120 permit tcp any host 192.168.30.56 eq 9876
+access-list 120 permit tcp any any eq 9876
+access-list 120 deny tcp any host 192.168.30.56 eq 9876
+!
+ip access-list extended cp-critical-in
+ remark BGP
+ permit tcp host 212.241.243.217 host 212.241.243.218 eq bgp
+ permit tcp host 212.241.243.217 eq bgp host 212.241.243.218
+ permit tcp host 192.168.224.154 host 192.168.224.153 eq bgp
+ permit tcp host 192.168.224.154 eq bgp host 192.168.224.153
+ permit tcp host 192.168.224.150 host 192.168.224.149 eq bgp
+ permit tcp host 192.168.224.150 eq bgp host 192.168.224.149
+ permit tcp host 192.168.224.162 host 192.168.224.161 eq bgp
+ permit tcp host 192.168.224.162 eq bgp host 192.168.224.161
+ permit tcp host 192.168.123.123 host 192.192.192.192 eq ftp
+ remark DHCP
+ permit udp host 0.0.0.0 host 255.255.255.255 eq bootps
+ permit udp host 10.1.23.1 eq bootps any eq bootps
+ remark CSM Probes HTTPS
+ permit tcp host 192.168.224.10 host 192.168.224.51 eq ssl
+ permit tcp host 192.168.224.10 host 192.168.224.52 eq ssl log
+ permit tcp host 192.168.224.51 eq ssl host 192.168.224.10
+ permit tcp host 192.168.224.52 eq ssl host 192.168.224.10
+ permit tcp host 192.168.224.11 host 192.168.224.51 eq ssl log
+ permit tcp host 192.168.224.11 host 192.168.224.52 eq ssl
+ permit tcp host 192.168.224.51 eq ssl host 192.168.224.11
+ permit tcp host 192.168.224.52 eq ssl host 192.168.224.11
+ remark CSM Probes ICMP
+ permit icmp host 192.168.224.10 host 192.168.224.51 echo
+ permit icmp host 192.168.224.10 host 192.168.224.52 echo
+ permit icmp host 192.168.224.51 host 192.168.224.10 echo-reply
+ permit icmp host 192.168.224.52 host 192.168.224.10 echo-reply
+ permit icmp host 192.168.224.11 host 192.168.224.51 echo
+ permit icmp host 192.168.224.11 host 192.168.224.52 echo
+ permit icmp host 192.168.224.51 host 192.168.224.11 echo-reply
+ permit icmp host 192.168.224.52 host 192.168.224.11 echo-reply
+ deny ip any any
+!
+ip access-list extended named-acl-1
+ deny ip host 172.168.2.3 any
+ deny ip host 10.8.10.11 any
+ permit ip any any
+!
+ip access-list extended named-acl-2
+ permit ip host 192.168.76.4 any
+ permit ip host 172.18.19.1 any
+!
+!
+!
+!
+!
+!
+crypto-ssl certificate generate secret_data MIICyzCCAjSgAwIBAgIEfFWErzANBgkqhkiG9w0BAQUFADBwMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEYMBYGA1UEChMPVGhlIERlbW8gVmVuZG9yMRwwGgYDVQQLExNTZWN1cmUgRGV2aWNlcyBEZXB0MRQwEgYDVQQDEwtEZW1vIFZlbmRvcjAeFw0wNzA5MDcwMDAwMDBaFw0xOTAxMDEwMDAwMDBaMIGwMRgwFgYDVQQDEw93d3cuYnJvY2FkZS5jb20xLTArBgNVBAoTJEJyb2NhZGUgQ29tbXVuaWNhdGlvbnMgU3lzdGVtcywgSW5jLjEtMCsGA1UECxMkQnJvY2FkZSBDb21tdW5pY2F0aW9ucyBTeXN0ZW1zLCBJbmMuMRQwEgYDVQQHEwtTYW50YSBDbGFyYTETMBEGA1UECBMKQ2FsaWZvcm5pYTELMAkGA1UEBhMCVVMwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKZJO9mmy7giQXFYgYx88Oi/0SqTwncpRxJ6pM5tkBzwlvt/KimU0Ml6M0HcxGu/WsywWhGQtsuq8uPpbn1YV7mQ4waEnf/k1l2YjEjAmaX26IG6ubqDC3uKYMFrIJjvk2lU4nfkTZsYscxS86Crl1wcuAANUdRg45Op0E3RrkL5AgMBAAGjMTAvMB8GA1UdIwQYMBaAFEIo/VN7ViV8xc56L0txqqpk8NAeMAwGA1UdDwQFAwMHoAAwDQYJKoZIhvcNAQEFBQADgYEAk7/DxvF9CqhwU9lUk2iXWiw+KWUPTVEItLvt0Cj5zglGZ/xUNv1oQ9WCcbi/R0kjp+LYuaMCcnUCtMFZexX3TJF698uAu86PuMDurH2syAbo8cgP8GvaMAlAYszZMUFcc3iTU7WM7bzpqzpjFnH9KB4saC6zP2IwRP1dqIO/m8kwggJdAgEAAoGBAKZJO9mmy7giQXFYgYx88Oi/0SqTwncpRxJ6pM5tkBzwlvt/KimU0Ml6M0HcxGu/WsywWhGQtsuq8uPpbn1YV7mQ4waEnf/k1l2YjEjAmaX26IG6ubqDC3uKYMFrIJjvk2lU4nfkTZsYscxS86Crl1wcuAANUdRg45Op0E3RrkL5AgMBAAECgYA/N2o0dY/PQd6lS6N8mGcx5PKNAD2W9a9aXBvZipeWGPUdSZvq0POLFRT1fguCdu37ETQ8p0qHJUdP1Ae4SWSXvzp3spRJowenlSvghFod3nRI3vwB4sZOJqWWPBU6466k5YwhTxteksF/T+xES1OGoVzuk8HDwe/Uwi4qWJdI8QJBANzgAsUXW7PxT72vs1M4JgVZ3OgrG81jzvY/Lk2caMFHDXmXfcjJcZ1E2VDQEPhSW5bD5avENK1VX3PAgbPYQj0CQQDAut1kLpKbeUDkbuRGVwG9sBCakfsvrZqBabS3vQTnWsoFwkfdojWQbURfCfbYIKj4v+WPkjYhJvRKasloDjttAkEAnR0Tm1MEPjmW+V0z+Cxmj0Pe6Z9QhYdLvsoui7KIqYN7SFTEesEgejhxRRTcHWeoEtSCWO6Wcf3aiiIToPRiGQJAQJ7nGG4dLhAL2Avucj8+EDH2fz0vMZ9NzNJ6i5jPChuA3Ul0+zUmLJTWdd9LatAYl78P44GssJT1F/aSLVeISQJBAImxs3evQA0j9122h6MrA6tlwahJNJGfCaOYBbJGiiyIVzgwd+zvMg8XbU/CS25xvoCyMKCc9P5dB3akqIVTto0=
+!
+end

@@ -1,0 +1,162 @@
+dis cur
+#
+ sysname 5500-EI
+#
+ 3COM Switch 2 3 Software Version 6 7 85500-EI
+#
+ password-control login-attempt 3 exceed lock-time 120
+#
+ super password level 3 simple password
+#
+ ip host testhost 10.10.10.10
+#
+ dhcp-server 19 ip  168.172.12.14 168.172.12.15
+#
+ router id 1.2.3.7
+#
+ lldp enable
+#
+ port-security enable
+#
+ am enable
+#
+ vrrp ping-enable
+#
+ multicast routing-enable
+#
+ dns server 8.8.8.8
+ dns domain titania.co.uk                 
+#
+ system-guard ip enable
+#
+ssl server-policy testssl
+ ciphersuite rsa_des_cbc_sha rsa_aes_256_cbc_sha
+######   rsa_3des_ede_cbc_sha  RSA_3DES_EDE_CBC_SHA
+######   rsa_aes_128_cbc_sha   RSA_AES_128_CBC_SHA
+######   rsa_aes_256_cbc_sha   RSA_AES_256_CBC_SHA
+######   rsa_des_cbc_sha       RSA_DES_CBC_SHA
+######   rsa_rc4_128_md5       RSA_RC4_128_MD5
+######   rsa_rc4_128_sha       RSA_RC4_128_SHA
+ssl server-policy 1
+#
+ web-authentication web-server ip 10.10.10.10 port 80
+#
+radius scheme system
+#
+domain system
+domain example.ad
+#
+local-user admin
+ service-type telnet
+local-user andy
+#
+acl number 2222
+ description a test basic acl
+ rule 10 permit source 10.10.10.10 0
+ rule 20 permit source 0.0.0.20 255.255.255.0
+ rule 30 permit
+ rule 31 deny source 1.2.3.4 0            
+#
+acl number 3333
+ description a test advanced acl
+ rule 0 permit ip source 10.10.10.10 0 destination 20.20.20.0 0.0.0.255
+ rule 1 permit tcp source 2.3.0.0 0.0.255.255 source-port lt 56 destination 1.2.3.4 0 destination-port gt 4
+ rule 2 deny ospf
+ rule 3 deny icmp
+#
+acl number 4444
+ rule 0 permit 802.3 source 0014-0014-0014 0055-0055-0055
+#
+vlan 1
+#
+interface Vlan-interface1
+ local-proxy-arp enable
+ description test interface
+ ip address 192.168.0.19 255.255.255.0
+ ospf authentication-mode simple password
+#
+ ntp-service access server 2222
+#
+interface Aux1/0/0
+#                                         
+interface Ethernet1/0/1
+#
+interface Ethernet1/0/2
+#
+interface Ethernet1/0/3
+#
+interface Ethernet1/0/4
+#
+interface Ethernet1/0/5
+#
+interface Ethernet1/0/6
+#
+interface Ethernet1/0/7
+#
+interface Ethernet1/0/8
+#
+interface Ethernet1/0/9
+#
+interface Ethernet1/0/10
+#
+interface Ethernet1/0/11
+#
+interface Ethernet1/0/12
+#                                         
+interface Ethernet1/0/13
+#
+interface Ethernet1/0/14
+#
+interface Ethernet1/0/15
+#
+interface Ethernet1/0/16
+#
+interface Ethernet1/0/17
+#
+interface Ethernet1/0/18
+#
+interface Ethernet1/0/19
+#
+interface Ethernet1/0/20
+#
+interface Ethernet1/0/21
+#
+interface Ethernet1/0/22
+#
+interface Ethernet1/0/23
+#
+interface Ethernet1/0/24
+#                                         
+interface GigabitEthernet1/0/25
+ port-security max-mac-count 20
+ port-security port-mode autolearn
+ packet-filter inbound ip-group 2222 rule 10
+ packet-filter inbound ip-group 2222 rule 20
+ packet-filter inbound ip-group 2222 rule 30
+ packet-filter inbound ip-group 2222 rule 31
+ packet-filter outbound ip-group 3333 rule 0
+ packet-filter outbound ip-group 3333 rule 2
+ packet-filter outbound ip-group 3333 rule 3
+ packet-filter outbound ip-group 2222 rule 10
+ packet-filter outbound ip-group 2222 rule 20
+ packet-filter outbound ip-group 2222 rule 30
+ packet-filter outbound ip-group 2222 rule 31
+ ip source static binding ip-address 20.20.20.20 vlan 45
+#
+interface GigabitEthernet1/0/26
+#
+interface GigabitEthernet1/0/27
+#
+interface GigabitEthernet1/0/28
+#
+ undo xrn-fabric authentication-mode
+#                                         
+interface NULL0
+#
+ telnet-server source-interface Vlan-interface1
+#
+user-interface aux 0 7
+user-interface vty 0 4
+#                                         
+return
+[5500-EI]

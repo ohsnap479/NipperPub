@@ -1,0 +1,197 @@
+router03#sh run
+Building configuration...
+
+Current configuration : a number of bytes
+!
+! Last configuration change at sometime Fri June 10 2006 by anyone
+! NVRAM config last updated at sometime Sat August 2 2006 by anyone
+!
+! Pass with --edge to produce all router errors.
+
+version 12.3
+service tcp-keepalives-out
+!
+hostname router03
+!
+clock timezone GMT 0
+clock summer-time GMT recurring
+ip domain-name nipper.org
+privilege exec level chicken
+enable password cisco
+key chain testchain
+ key 1
+  key-string 7 044B0A151C36435C0D
+username temp privilege 15 password 7 095C4F1A0A1218000F
+username testuser privilege 15 password 7 095C4F1A0A1218000F
+username localuser privilege 15 password 7 095C4F1A0A1218000F
+boot network
+no service finger
+no service tcp-small-servers
+no service udp-small-servers
+security passwords min-length 8
+snmp-server community public RO 20
+snmp-server community private RW
+snmp-server location Somewhere
+snmp-server host 192.168.20.30 private snmp
+snmp-server host 192.168.20.40 private snmp
+snmp-server system-shutdown
+!
+!
+key chain routing-chain
+ key 1
+ key-string cisco
+!
+ntp server 1.1.1.1
+!
+interface GigabitEthernet1/1
+ description First interface on switch
+ speed 100
+ duplex full
+ ip address 10.0.0.1
+ ip directed-broadcast
+ ip ospf network point-to-multipoint
+ switchport mode trunk
+ ip mask-reply
+ no ip proxy-arp
+ vrrp 2 ip 192.168.4.2
+ vrrp 2 authentication text password
+ ip rip authentication key-chain routing-chain
+ ip rip authentication mode text
+ standby ip 192.168.5.10
+ standby version 2
+ standby authentication text Passw0rd
+ glbp 44 ip 192.168.8.42
+ glbp 44 authentication text Passw0rd
+!
+interface GigabitEthernet1/2
+ description Second interface on switch
+ speed 100
+ duplex full
+ ip address 10.0.0.2
+ ip directed-broadcast
+ ip ospf network point-to-multipoint
+ ip hold-time eigrp 3 14
+ switchport mode trunk
+ ip mask-reply
+ vrrp 3 ip 192.168.3.2
+ ip rip send version 2
+ standby 20 ip 192.168.5.20
+ glbp 40 ip 192.168.7.42
+!
+ip access-list extended named-acl-1
+ deny ip host 172.168.2.3 any
+ deny ip host 10.8.10.11 any
+ permit ip any any
+ip access-list extended named-acl-2
+ permit ip host 192.168.76.4 any
+ permit ip host 172.18.19.1 any
+!
+ip access-list extended cp-critical-in
+ remark Control plane critical traffic - inbound
+ remark BGP
+ permit tcp host 212.241.243.217 host 212.241.243.218 eq bgp
+ permit tcp host 212.241.243.217 eq bgp host 212.241.243.218
+ permit tcp host 192.168.224.154 host 192.168.224.153 eq bgp
+ permit tcp host 192.168.224.154 eq bgp host 192.168.224.153
+ permit tcp host 192.168.224.150 host 192.168.224.149 eq bgp
+ permit tcp host 192.168.224.150 eq bgp host 192.168.224.149
+ permit tcp host 192.168.224.162 host 192.168.224.161 eq bgp
+ permit tcp host 192.168.224.162 eq bgp host 192.168.224.161
+ permit tcp host 192.168.123.123 host 192.192.192.192 eq ftp
+ remark DHCP
+ permit udp host 0.0.0.0 host 255.255.255.255 eq bootps
+ permit udp host 10.1.23.1 eq bootps any eq bootps
+ remark CSM Probes HTTP
+ permit tcp host 192.168.224.10 host 192.168.224.51 eq www
+ permit tcp host 192.168.224.10 host 192.168.224.52 eq www
+ permit tcp host 192.168.224.51 eq www host 192.168.224.10
+ permit tcp host 192.168.224.52 eq www host 192.168.224.10 established
+ permit tcp host 192.168.224.11 host 192.168.224.51 eq www
+ permit tcp host 192.168.224.11 host 192.168.224.52 eq www
+ permit tcp host 192.168.224.51 eq www host 192.168.224.11 fragments
+ permit tcp host 192.168.224.52 eq www host 192.168.224.11
+ remark CSM Probes HTTPS
+ permit tcp host 192.168.224.10 host 192.168.224.51 eq 443
+ permit tcp host 192.168.224.10 host 192.168.224.52 eq 443 log
+ permit tcp host 192.168.224.51 eq 443 host 192.168.224.10
+ permit tcp host 192.168.224.52 eq 443 host 192.168.224.10
+ permit tcp host 192.168.224.11 host 192.168.224.51 eq 443 log
+ permit tcp host 192.168.224.11 host 192.168.224.52 eq 443
+ permit tcp host 192.168.224.51 eq 443 host 192.168.224.11
+ permit tcp host 192.168.224.52 eq 443 host 192.168.224.11
+ remark CSM Probes ICMP
+ permit icmp host 192.168.224.10 host 192.168.224.51 echo
+ permit icmp host 192.168.224.10 host 192.168.224.52 echo
+ permit icmp host 192.168.224.51 host 192.168.224.10 echo-reply
+ permit icmp host 192.168.224.52 host 192.168.224.10 echo-reply
+ permit icmp host 192.168.224.11 host 192.168.224.51 echo
+ permit icmp host 192.168.224.11 host 192.168.224.52 echo
+ permit icmp host 192.168.224.51 host 192.168.224.11 echo-reply
+ permit icmp host 192.168.224.52 host 192.168.224.11 echo-reply
+ deny   ip any any
+access-list 110 permit tcp any any
+access-list 120 permit ip 50.60.0.0 0.0.255.255 any
+access-list 120 permit tcp any eq ftp any log-input
+access-list 120 permit tcp any host 192.168.30.40 eq snmp
+access-list 120 permit tcp host 192.168.20.10 host 192.168.30.40 eq snmp
+access-list 120 permit tcp host 192.168.20.12 host 192.168.30.40 eq snmp
+access-list 120 permit tcp any host 192.168.30.56 eq 9876
+access-list 120 permit tcp any any eq 9876
+access-list 120 deny tcp any host 192.168.30.56 eq 9876
+access-list 40 permit 192.168.2.1
+access-list 40 permit 172.10.1.35
+access-list 40 permit 10.0.0.1
+access-list 40 permit 192.168.0.1
+access-list 40 deny   any log
+!
+router eigrp 14
+ redistribute connected
+ redistribute static
+ network 10.0.0.0
+ network 172.10.1.0
+ distribute-list 40 out
+ no auto-summary
+ no eigrp log-neighbor-warnings
+!
+router bgp 1
+ no synchronization
+ bgp router-id 192.168.56.5
+ bgp log-neighbor-changes
+ network 192.168.22.1 mask 255.255.255.255
+ neighbor router01 peer-group
+ neighbor router01 remote-as 12345
+ neighbor router01 description Site to Site Connection
+ neighbor router01 version 4
+ no auto-summary
+!
+router ospf 6
+ network 10.0.0.1 0.0.0.255 area 0.0.0.0
+ network 192.168.0.1 0.0.0.255 area 30.10.20.40
+ area 0.0.0.0 range 10.0.0.1 255.255.255.0
+ area 30.10.20.40 range 192.168.0.1 255.255.255.0
+!
+router eigrp 3
+ eigrp router-id 127.0.0.1
+ network 192.168.56.0
+!
+router rip
+ network 10.0.0.0
+!
+!
+line con 0
+ session-timeout 25
+ password 7 095C4F1A0A1218000F
+ login
+line aux 0
+ session-timeout 25
+ login
+ password 7 095C4F1A0A1218000F
+line vty 0 4
+ access-class 10 in vrf-also
+ password 7 095C4F1A0A1218000F
+ logging synchronous
+ transport input ssh
+!
+end
+
+router03#

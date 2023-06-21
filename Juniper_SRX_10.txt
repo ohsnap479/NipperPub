@@ -1,0 +1,567 @@
+## Last commit: 2016-08-04 12:03:34 UTC by charles
+version 10.0R3.10;
+system {
+    host-name Office-Juniper-SRX;
+    domain-name Office12;
+    root-authentication {
+        encrypted-password "$1$MP1l0G9Q$TiDTTaRx8Bo9tXZMfZjwP/"; ## SECRET-DATA
+    }
+    login {
+        class super-user-local {
+            idle-timeout 10;
+            permissions all;
+        }
+        class staff {
+            permissions view-configuration;
+            allow-commands show;
+            deny-commands "(clear)|(file)|(file show)|(help)|(load)|(monitor)|(op)|(request)|(save)|(set)|(start)|(test)";
+            allow-configuration show;
+            deny-configuration all;
+        }
+        user admin {
+            full-name admin;
+            uid 200;
+            class super-user;
+            authentication {
+                encrypted-password "$1$VL5FA905$AFpRPjdXbgWFjlg3VYiZD1"; ## SECRET-DATA
+            }
+        }
+        user charles {
+            full-name Charles De Gaulle;
+            uid 2007;
+            class test;
+            authentication {
+                encrypted-password "$1$U2NCuMUy$8E6cVLicRD3cYFexZ8BKN."; ## SECRET-DATA
+            }
+        }
+    }
+    services {
+        ftp;
+        ssh;
+        web-management {
+            http {
+                interface [ ge-0/0/1.0 st0.0 ];
+            }
+            https {
+                system-generated-certificate;
+                interface [ ge-0/0/1.0 st0.0 ge-0/0/0.0 ];
+            }
+            session {
+                session-limit 7;
+            }
+        }
+        dhcp {
+            router {
+                192.168.1.1;
+            }
+            pool 192.168.1.0/24 {
+                address-range low 192.168.1.2 high 192.168.1.254;
+            }
+            propagate-settings ge-0/0/0.0;
+        }
+    }
+    syslog {
+        archive size 100k files 3;
+        user * {
+            any emergency;
+        }
+        file messages {
+            any critical;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands error;
+        }
+    }
+    max-configurations-on-flash 5;
+    max-configuration-rollbacks 5;
+    license {
+        autoupdate {
+            url https://ae1.juniper.net/junos/key_retrieval;
+        }
+    }
+    ntp {
+        authentication-key 254 type md5 value "$9$O2/5BhreK87dsM8i.5FAtM8XxNb"; ## SECRET-DATA
+        server 192.168.1.20;
+        trusted-key 254;
+    }
+}
+interfaces {
+    interface-range interfaces-trust {
+        member ge-0/0/1;
+        member fe-0/0/2;
+        member fe-0/0/3;
+        member fe-0/0/4;
+        member fe-0/0/5;
+        member fe-0/0/6;
+        member fe-0/0/7;
+        unit 0 {
+            family ethernet-switching {
+                vlan {
+                    members vlan-trust;
+                }
+            }
+        }
+    }
+    ge-0/0/0 {
+        unit 0 {
+            family inet {
+                address 5.6.7.50/24;
+                address 3.4.5.100/24;
+            }
+        }
+    }
+    ge-0/0/1 {
+        mtu 1500;
+        unit 0 {
+            family ethernet-switching;
+        }
+    }
+    fe-0/0/3 {
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+            }
+        }
+    }
+    fe-0/0/4 {
+        unit 0;
+    }
+    fe-0/0/5 {
+        unit 0 {
+            family ethernet-switching;
+        }
+    }
+    fe-0/0/6 {
+        unit 0 {
+            family ethernet-switching;
+        }
+    }
+    vlan {
+        unit 0 {
+            family inet {
+                address 192.168.1.1/24;
+            }
+        }
+    }
+}
+snmp {
+    view jweb-view-all {
+        oid .1 include;
+    }
+}
+routing-options {
+    med-igp-update-interval 10;
+    bmp {
+        station-address 11.11.11.11;
+        station-port 22;
+    }
+    bgp-orf-cisco-mode;
+    source-routing {
+        ip;
+    }
+    options {
+        syslog {
+            level critical warning;
+        }
+    }
+    static {
+        route 0.0.0.0/0 {
+            next-hop 12.90.18.254;
+            passive;
+        }
+        route 11.11.11.11/32 {
+            reject;
+            no-install;
+            passive;
+        }
+        route 11.11.11.12/32 {
+            discard;
+            retain;
+        }
+        route 11.11.11.13/32 {
+            reject;
+            readvertise;
+            resolve;
+        }
+    }
+    aggregate {
+        route 15.11.11.0/32 passive;
+    }
+    generate {
+        route 10.10.10.0/32 discard;
+    }
+    maximum-paths 55555 threshold 98 log-interval 100;
+    maximum-prefixes 5555555 log-only log-interval 86400;
+    route-record;
+    resolution {
+        traceoptions {
+            flag event receive;
+        }
+    }
+    multicast {
+        asm-override-ssm;
+    }
+    dynamic-tunnels {
+        tunnel {
+            source-address 11.12.12.12;
+            tunnel-type gre;
+            destination-networks {
+                12.13.13.0/32;
+            }
+        }
+    }
+}
+protocols {
+    ospf {
+        area 0.0.0.0 {
+            interface ge-0/0/1.0 {
+                authentication {
+                    md5 5 key "$9$f539AtORcluOds4ZkquO1IEy"; ## SECRET-DATA
+                }
+            }
+        }
+    }
+    ospf3 {
+        realm ipv4-multicast {
+            traceoptions {
+                flag hello receive;
+            }
+            overload timeout 60;
+        }
+        spf-options {
+            holddown 2500;
+            rapid-runs 2;
+            no-ignore-our-externals;
+        }
+        traffic-engineering {
+            shortcuts lsp-metric-into-summary;
+        }
+        external-preference 10;
+        reference-bandwidth 9600;
+        no-rfc-1583;
+        no-nssa-abr;
+    }
+    rip {
+        authentication-type md5;
+        authentication-key "$9$v68MxdbwgJUHYgnCu1yrYgoaZj"; ## SECRET-DATA
+        group rip-group;
+    }
+    dot1x {
+        authenticator {
+            authentication-profile-name juniper-access-profile;
+            static {
+                aa:fe:dd:ee:aa:dd/48;
+                aa:aa:aa:aa:aa:bb/48 {
+                    vlan-assignment vlan-trust;
+                    interface ge-0/0/1.0;
+                }
+            }
+            interface {
+                ge-0/0/1.0 {
+                    supplicant multiple;
+                    reauthentication 3600;
+                    ##
+                    ## Warning: statement ignored: unsupported platform (srx210-lm)
+                    ## Warning: vlan assigned is not configured
+                    ##
+                    guest-vlan default;
+                }
+                fe-0/0/4.0 {
+                    ##
+                    ## Warning: Interface must be defined in the interfaces hierarchy with family ethernet-switching
+                    ##
+                    supplicant single;
+                    reauthentication 3600;
+                }
+                fe-0/0/5.0 {
+                    supplicant multiple;
+                    retries 7;
+                    quiet-period 54;
+                    transmit-period 24;
+                    reauthentication 4052;
+                    supplicant-timeout 12;
+                    server-timeout 47;
+                    maximum-requests 10;
+                }
+                fe-0/0/6.0 {
+                    supplicant single;
+                    no-reauthentication;
+                    ##
+                    ## Warning: statement ignored: unsupported platform (srx210-lm)
+                    ##
+                    guest-vlan vlan-trust;
+                }
+            }
+        }
+    }
+}
+security {
+    ipsec {
+        policy juniperPolicy;
+    }
+    nat {
+        source {
+            rule-set trust-to-untrust {
+                from zone trust;
+                to zone untrust;
+                rule source-nat-rule {
+                    match {
+                        source-address 0.0.0.0/0;
+                    }
+                    then {
+                        source-nat {
+                            interface;
+                        }
+                    }
+                }
+            }
+        }
+        proxy-arp {
+            interface fe-0/0/2.0 {
+                ##
+                ## Warning: Interface must be defined under [interfaces]
+                ##
+                address {
+                    1.2.3.4/32;
+                }
+            }
+        }
+    }
+    log {
+        mode event;
+        event-rate 0;
+        format syslog;
+    }
+    screen {
+        ids-option untrust-screen {
+            icmp {
+                ping-death;
+            }
+            ip {
+                source-route-option;
+                tear-drop;
+            }
+            tcp {
+                syn-flood {
+                    alarm-threshold 1024;
+                    attack-threshold 200;
+                    source-threshold 1024;
+                    destination-threshold 2048;
+                    timeout 20;
+                }
+                land;
+            }
+        }
+    }
+    zones {
+        security-zone trust {
+            host-inbound-traffic {
+                system-services {
+                    all;
+                }
+                protocols {
+                    all;
+                }
+            }
+            interfaces {
+                vlan.0;
+            }
+        }
+        security-zone untrust {
+            address-book {
+                address testAdd 10.10.10.1/32;
+            }
+            screen untrust-screen;
+            host-inbound-traffic {
+                system-services {
+                    all;
+                }
+            }
+            interfaces {
+                ge-0/0/0.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            dhcp;
+                            tftp;
+                            all;
+                        }
+                    }
+                }
+                ge-0/0/1.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            all;
+                        }
+                    }
+                }
+            }
+        }
+        security-zone zone1 {
+            address-book {
+                address H-NAME1-10-64-4-32 10.64.4.32/32;
+                address H-NAME2-10-14-12-64 10.14.12.64/32;
+                address H-NAME3-10-14-12-111 10.14.12.111/32;
+                address NAME4-10-4-10-38 10.4.10.38/32;
+            }
+            host-inbound-traffic {
+                system-services {
+                    all;
+                }
+                protocols {
+                    all;
+                }
+            }
+        }
+        security-zone internet {
+            address-book {
+                address Policy77 192.168.5.1/32;
+            }
+        }
+    }
+    policies {
+        from-zone trust to-zone internet {
+            policy Policy3 {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    reject;
+                }
+            }
+            policy Policy7 {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+            policy Marketing-Allow-Outboud {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+        from-zone zone1 to-zone internet {
+            policy Policy14 {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+        from-zone untrust to-zone untrust {
+            policy TestPolicy1 {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application [ junos-ftp junos-smtp junos-bootps ];
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+        from-zone trust to-zone trust {
+            policy NewTestACL {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+        from-zone trust to-zone untrust {
+            policy Policy76 {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+        from-zone untrust to-zone trust {
+            policy Policy77 {
+                match {
+                    source-address testAdd;
+                    destination-address any;
+                    application secret;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+        default-policy {
+            permit-all;
+        }
+    }
+}
+firewall {
+    family any {
+        filter newfilter {
+            term newrule {
+                from {
+                    packet-length 11111;
+                }
+            }
+        }
+    }
+}
+access {
+    radius-server {
+        10.150.3.3 {
+            port 85;
+            secret "$9$LC.Xds2gJDHmoJCu1hKvoJGUjq"; ## SECRET-DATA
+            timeout 10;
+            retry 3;
+            source-address 10.150.3.4;
+        }
+    }
+    profile juniper-access-profile {
+        authentication-order radius;
+        radius {
+            authentication-server 10.150.3.3;
+        }
+    }
+    firewall-authentication {
+        pass-through {
+            default-profile juniper-access-profile;
+        }
+        web-authentication {
+            default-profile juniper-access-profile;
+        }
+    }
+}
+applications {
+    application secret protocol 0;
+}
+vlans {
+    vlan-trust {
+        vlan-id 3;
+        interface {
+            ge-0/0/1.0;
+        }
+        l3-interface vlan.0;
+    }
+}
