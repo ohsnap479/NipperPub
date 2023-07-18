@@ -50,7 +50,7 @@ local-user admin
  service-type telnet
 local-user andy
 #
-acl number 2222
+acl number 2221
  description a test basic acl
  rule 10 permit source 10.10.10.10 0
  rule 20 permit source 0.0.0.20 255.255.255.0
