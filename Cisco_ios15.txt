@@ -22,7 +22,7 @@ security passwords min-length 8
 enable secret 8 $1$..wG$DKcdHPgPVcbHhwGCizrOj/
 !
 aaa new-model
-aaa local authentication attempts max-fail 30
+aaa local authentication attempts max-fail 31
 !
 !
 aaa authentication login default local
